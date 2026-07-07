@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "58AC5DA6-C065-4F12-A037-2B8D30B1E41C",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SwiftStashTests",
+        "name" : "SwiftStashTests"
+      }
+    }
+  ],
+  "version" : 1
+}
