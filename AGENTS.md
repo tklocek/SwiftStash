@@ -257,5 +257,5 @@ cd Example && xcodebuild -project SwiftStashExample.xcodeproj \
 - Swift 6 language mode with `strictMemorySafety()`; both library targets must stay warning-free under strict concurrency.
 - `SwiftStash` module must not import SwiftUI (its whole reason to exist). UI-facing code goes in `SwiftStashUI`.
 - The core wrappers `Stash` and `SecureStash` are `Sendable` with `nonmutating set` — keep them usable as `static let`. `Stashed` is a `@MainActor` SwiftUI `DynamicProperty`, not the shared-state wrapper.
-- Public API is documented with DocC (`Sources/SwiftStash/SwiftStash.docc/`); update the catalogue when adding public symbols.
+- Public API is documented with DocC; update the catalogue when adding public symbols. The package catalogue (articles + core symbols) is `Sources/SwiftStash/SwiftStash.docc/`; `Sources/SwiftStashUI/SwiftStashUI.docc/` holds only that module's landing page (its abstract is the module's tile on the merged documentation site built by `Scripts/build-docs.sh`).
 - Logging: keys are `.private`, type names `.public` — never log stored values.

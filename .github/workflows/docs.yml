@@ -1,0 +1,53 @@
+# Builds the DocC documentation site and publishes it to GitHub Pages
+# on every push to main. Pull requests and manual runs on other branches
+# build the site (and upload it as a downloadable artifact) without deploying.
+# Requires: repo Settings → Pages → Source = "GitHub Actions".
+name: Documentation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One Pages deployment at a time; let in-flight deployments finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Package.swift declares swift-tools-version 6.2, which needs Xcode 26+.
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Show toolchain
+        run: xcodebuild -version && swift --version
+
+      - name: Build DocC site
+        run: Scripts/build-docs.sh .build/docs-site
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: .build/docs-site
+
+  deploy:
+    # Only pushes to main (and manual runs on main) publish to the live site.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
