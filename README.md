@@ -1,6 +1,6 @@
 # SwiftStash
 
-[![Swift 6.2](https://img.shields.io/badge/Swift-6.2-F05138?style=flat-square&logo=swift&logoColor=white)](https://www.swift.org/)[![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20visionOS%20%7C%20Mac%20Catalyst-0A84FF?style=flat-square&logo=apple&logoColor=white)](#requirements)[![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-F05138?style=flat-square&logo=swift&logoColor=white)](#installation)[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+[![Swift 6.2](https://img.shields.io/badge/Swift-6.2-F05138?style=flat-square&logo=swift&logoColor=white)](https://www.swift.org/)[![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20visionOS%20%7C%20Mac%20Catalyst-0A84FF?style=flat-square&logo=apple&logoColor=white)](#requirements)[![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-F05138?style=flat-square&logo=swift&logoColor=white)](#installation)[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)[![Documentation](https://img.shields.io/badge/Documentation-DocC-34C759?style=flat-square&logo=swift&logoColor=white)](https://tklocek.github.io/SwiftStash/)
 
 Type-safe, property wrapper-based persistence for Swift: UserDefaults, Keychain, and SwiftUI — with built-in privacy-preserving logging.
 
@@ -53,6 +53,13 @@ If you need [KeychainAccess](https://github.com/kishikawakatsumi/KeychainAccess)
 - 🧵 **Swift 6 ready** — `Sendable` wrappers, safe as `static let` under strict concurrency
 - 🪵 **Built-in logging** — privacy-preserving OSLog integration
 - ⚡ **Zero dependencies** — pure Swift, only Apple system frameworks (Foundation, Security, OSLog)
+
+## Documentation
+
+The full DocC documentation is published at **[tklocek.github.io/SwiftStash](https://tklocek.github.io/SwiftStash/)** and rebuilt from `main` on every push. One site covers both modules:
+
+- [SwiftStash](https://tklocek.github.io/SwiftStash/documentation/swiftstash/) — `@Stash`, `@SecureStash`, observation, logging, keychain & crypto, plus articles (getting started, migrating from `@AppStorage`)
+- [SwiftStashUI](https://tklocek.github.io/SwiftStash/documentation/swiftstashui/) — `@Stashed`
 
 ## Quick Start
 
