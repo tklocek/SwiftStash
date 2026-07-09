@@ -8,4 +8,4 @@ Read @AGENTS.md — it contains the full agent guide:
 - **Adoption playbook** for migrating an existing app from `@AppStorage` / raw `UserDefaults` / keychain code
 - Build & test commands and repo conventions for contributing
 
-`README.md` is the human-facing overview; DocC lives in `Sources/SwiftStash/SwiftStash.docc/`.
+`README.md` is the human-facing overview; DocC lives in `Sources/SwiftStash/SwiftStash.docc/` (package catalogue) and `Sources/SwiftStashUI/SwiftStashUI.docc/` (module landing page).
