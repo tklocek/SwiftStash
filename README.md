@@ -61,6 +61,8 @@ The full DocC documentation is published at **[tklocek.github.io/SwiftStash](htt
 - [SwiftStash](https://tklocek.github.io/SwiftStash/documentation/swiftstash/) — `@Stash`, `@SecureStash`, observation, logging, keychain & crypto, plus articles (getting started, migrating from `@AppStorage`)
 - [SwiftStashUI](https://tklocek.github.io/SwiftStash/documentation/swiftstashui/) — `@Stashed`
 
+The project's visual identity (logo, colours, typography, graphics rules) is documented in the **[brand book](https://tklocek.github.io/SwiftStash/branding/)**, published from [`Branding/`](Branding/).
+
 ## Quick Start
 
 ### `@Stash` — UserDefaults

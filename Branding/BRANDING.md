@@ -86,6 +86,7 @@ The three wrappers are presented as pill-shaped chips: monospace weight 600, tex
 - Fixed content: wordmark + strapline "Type-safe UserDefaults & Keychain for Swift" + the three wrapper chips; optionally "Zero dependencies · Swift 6 ready · MIT".
 - Any code shown on graphics must be **real code from the README** — never pseudocode.
 - Layouts that work: a dark code card on the Ivory background, a dark composition inside the 2 px light frame, or central typography over dimmed code.
+- Ready-to-upload exports in [Assets/](Assets/): [swiftstash-social-preview-light.png](Assets/swiftstash-social-preview-light.png) (dark code card on Ivory), [swiftstash-social-preview-dark.png](Assets/swiftstash-social-preview-dark.png) (framed dark canvas), [swiftstash-social-preview-typographic.png](Assets/swiftstash-social-preview-typographic.png) (central typography over code).
 
 ## 6 · DocC cards
 
@@ -106,7 +107,8 @@ Topic cards carry the brand into the documentation: bracket motif, Swift Orange 
 | Lockup (logo + wordmark), dark | `Branding/Assets/swiftstash-lockup-dark.svg` | README header on dark |
 | Lockup (logo + wordmark), light | `Branding/Assets/swiftstash-lockup-light.svg` | README header on light |
 | DocC topic cards, diagrams, icons (light + `~dark`) | `Sources/SwiftStash/SwiftStash.docc/Resources/`, `Sources/SwiftStashUI/SwiftStashUI.docc/Resources/` | DocC articles and landing pages — live at <https://tklocek.github.io/SwiftStash/documentation/> |
-| Interactive brand book | `Branding/SwiftStash Brand Book.html` | Browsing the identity with live previews |
+| Social preview PNGs (1280 × 640) | `Branding/Assets/swiftstash-social-preview-{light,dark,typographic}.png` | GitHub repository social preview |
+| Interactive brand book | `Branding/SwiftStash Brand Book.html` | Browsing the identity with live previews — published at <https://tklocek.github.io/SwiftStash/branding/> |
 
 For GitHub READMEs, pair the dark/light assets with `<picture>` and `prefers-color-scheme` so the correct variant renders in each theme.
 

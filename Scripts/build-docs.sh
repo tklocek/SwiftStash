@@ -57,6 +57,11 @@ xcrun docc process-archive transform-for-static-hosting \
 # Colours follow Branding/BRANDING.md (Swift Orange accent, Ink/Ivory heroes).
 cp "$REPO_ROOT/Sources/SwiftStash/SwiftStash.docc/theme-settings.json" "$OUTPUT/theme-settings.json"
 
+# Publish the interactive brand book next to the docs; it is a self-contained
+# page, served at <site root>/branding/ (linked from README.md).
+mkdir -p "$OUTPUT/branding"
+cp "$REPO_ROOT/Branding/SwiftStash Brand Book.html" "$OUTPUT/branding/index.html"
+
 # The DocC renderer's root index.html shows an empty shell; send visitors of
 # the site root straight to the synthesized landing page instead.
 cat > "$OUTPUT/index.html" <<'HTML'
