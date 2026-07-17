@@ -1,0 +1,65 @@
+# Builds the package and runs the full test suite on every pull request and
+# on every push to main. Pull requests get a per-test summary in the run page
+# and a pass/fail status check that branch protection uses to gate merging.
+# Feature-branch pushes without a PR intentionally do not trigger CI.
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A new push to the same PR cancels the still-running previous build;
+# runs on main are never cancelled so every merge keeps a complete record.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  test:
+    name: Build & test (macOS)
+    # Package.swift declares swift-tools-version 6.2, which needs Xcode 26+.
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Show toolchain
+        run: xcodebuild -version && swift --version
+
+      - name: Build (package + snippets)
+        run: swift build
+
+      - name: Run tests
+        # --xunit-output does not create the parent directory itself.
+        run: |
+          mkdir -p .build/test-results
+          swift test --xunit-output .build/test-results/tests.xml
+
+      - name: Validate Xcode templates
+        run: Templates/check.sh
+
+      - name: Publish test summary
+        if: always()
+        run: Scripts/test-summary.py .build/test-results >> "$GITHUB_STEP_SUMMARY"
+
+  example-app:
+    name: Build example app (iOS)
+    # The example app is the only compile check for SwiftStashUI consumers
+    # (see AGENTS.md), so it builds on the same triggers as the tests.
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build SwiftStashExample
+        working-directory: Example
+        run: |
+          xcodebuild -project SwiftStashExample.xcodeproj \
+            -scheme SwiftStashExample \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" build
