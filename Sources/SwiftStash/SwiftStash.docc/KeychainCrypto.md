@@ -1,5 +1,9 @@
 # Biometrics & Secure Enclave
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-keychain-crypto", alt: "Biometrics & Secure Enclave")
+}
+
 Protect keychain items with Face ID / Touch ID and generate hardware-backed cryptographic keys.
 
 ## Overview

@@ -9,3 +9,5 @@ Read @AGENTS.md — it contains the full agent guide:
 - Build & test commands and repo conventions for contributing
 
 `README.md` is the human-facing overview; DocC lives in `Sources/SwiftStash/SwiftStash.docc/` (package catalogue) and `Sources/SwiftStashUI/SwiftStashUI.docc/` (module landing page).
+
+For any visual/branded material (logos, README graphics, DocC theming, social previews), follow the brand book at `Branding/BRANDING.md` — approved decisions and ready SVG assets in `Branding/Assets/`.

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="352" height="72" viewBox="0 0 352 72" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
+    <path d="M20,10L10,10L10,62L20,62" style="fill:none;fill-rule:nonzero;stroke:rgb(240,81,56);stroke-width:5px;"/>
+    <path d="M52,10L62,10L62,62L52,62" style="fill:none;fill-rule:nonzero;stroke:rgb(240,81,56);stroke-width:5px;"/>
+    <path d="M46,36C46,34.344 44.656,33 43,33L29,33C27.344,33 26,34.344 26,36L26,46C26,47.656 27.344,49 29,49L43,49C44.656,49 46,47.656 46,46L46,36Z" style="fill:rgb(240,81,56);"/>
+    <path d="M31,33L31,28C31,25.257 33.257,23 36,23C38.743,23 41,25.257 41,28L41,33" style="fill:none;fill-rule:nonzero;stroke:rgb(209,58,34);stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;"/>
+    <g transform="matrix(1,0,0,1,82.3239,55.0592)">
+        <text x="0px" y="0px" style="font-family:'SFProDisplay-Bold', 'SF Pro Display', -apple-system, 'Segoe UI', sans-serif;font-weight:700;font-size:52px;fill:rgb(28,30,33);">S<tspan x="32.05px 72.352px 84.09px 101.819px " y="0px 0px 0px 0px ">wift</tspan></text>
+        <text x="119.524px" y="0px" style="font-family:'SFProDisplay-Bold', 'SF Pro Display', -apple-system, 'Segoe UI', sans-serif;font-weight:700;font-size:52px;fill:rgb(240,81,56);">S<tspan x="151.574px 169.024px 196.707px 222.689px " y="0px 0px 0px 0px ">tash</tspan></text>
+    </g>
+</svg>

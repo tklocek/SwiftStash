@@ -1,5 +1,9 @@
 # Migrating from @AppStorage
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-migrating", alt: "Migrating from @AppStorage")
+}
+
 Adopt SwiftStash in an existing app incrementally — one property at a time, with no data migration.
 
 ## Overview

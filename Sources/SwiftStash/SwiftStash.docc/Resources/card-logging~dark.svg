@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="Logging">
+  <defs>
+    <linearGradient id="bgD" x1="0.26" y1="0" x2="0.74" y2="1">
+      <stop offset="0" stop-color="#1d222c"></stop><stop offset="0.55" stop-color="#12151c"></stop><stop offset="1" stop-color="#0d1117"></stop>
+    </linearGradient>
+    <radialGradient id="glowD">
+      <stop offset="0" stop-color="#f05138" stop-opacity="0.18"></stop><stop offset="0.7" stop-color="#f05138" stop-opacity="0"></stop><stop offset="1" stop-color="#f05138" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  <rect x="0.5" y="0.5" width="639" height="359" rx="12" fill="url(#bgD)" stroke="#3d4450"></rect>
+  <ellipse cx="320" cy="137" rx="210" ry="160" fill="url(#glowD)"></ellipse>
+  <g transform="translate(254 69.1) scale(1.375)">
+    <path d="M20 24 h56 a6 6 0 0 1 6 6 v36 a6 6 0 0 1 -6 6 h-56 a6 6 0 0 1 -6 -6 v-36 a6 6 0 0 1 6 -6 Z" stroke="#f05138" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M28 40 l11 9 -11 9" stroke="#f05138" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M48 60 h16" stroke="#f2994a" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+  <text x="320" y="255.6" text-anchor="middle" font-family="-apple-system,&#39;SF Pro Display&#39;,&#39;Segoe UI&#39;,sans-serif" font-size="30" font-weight="600" letter-spacing="-0.6" fill="#ffffff">Logging</text>
+  <text x="320" y="284.1" text-anchor="middle" font-family="-apple-system,&#39;SF Pro Display&#39;,&#39;Segoe UI&#39;,sans-serif" font-size="15" letter-spacing="-0.075" fill="#8b949e">Configure logging to debug and monitor storage operations.</text>
+</svg>

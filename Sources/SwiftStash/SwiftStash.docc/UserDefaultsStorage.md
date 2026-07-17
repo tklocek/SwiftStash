@@ -1,5 +1,9 @@
 # UserDefaults Storage with @Stash
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-userdefaults", alt: "UserDefaults Storage")
+}
+
 Store app preferences and state in UserDefaults with type safety.
 
 ## Overview

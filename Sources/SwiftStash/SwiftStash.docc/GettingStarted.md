@@ -1,5 +1,9 @@
 # Getting Started
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-getting-started", alt: "Getting Started")
+}
+
 Learn how to integrate SwiftStash into your project and start using type-safe storage.
 
 ## Installation

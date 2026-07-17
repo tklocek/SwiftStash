@@ -225,6 +225,7 @@ Example/                       SwiftStashExample iOS app (not part of the packag
 Snippets/                      SPM snippets — compile-checked usage examples (built by swift build)
 Templates/                     optional Xcode file templates plus install/uninstall scripts
                                (NOT built by swift build — validated by Templates/check.sh)
+Branding/                      brand book (BRANDING.md) + ready SVG logo/lockup assets
 SwiftStashExample.xcworkspace  package + example app in one window
 ```
 
@@ -259,3 +260,7 @@ cd Example && xcodebuild -project SwiftStashExample.xcodeproj \
 - The core wrappers `Stash` and `SecureStash` are `Sendable` with `nonmutating set` — keep them usable as `static let`. `Stashed` is a `@MainActor` SwiftUI `DynamicProperty`, not the shared-state wrapper.
 - Public API is documented with DocC; update the catalogue when adding public symbols. The package catalogue (articles + core symbols) is `Sources/SwiftStash/SwiftStash.docc/`; `Sources/SwiftStashUI/SwiftStashUI.docc/` holds only that module's landing page (its abstract is the module's tile on the merged documentation site built by `Scripts/build-docs.sh`).
 - Logging: keys are `.private`, type names `.public` — never log stored values.
+
+### Branding
+
+All visual material (README graphics, DocC theming, social previews, example-app branding) follows `Branding/BRANDING.md` — the approved brand book, with ready-to-use SVG assets in `Branding/Assets/`. Key locked decisions: the padlock-in-square-brackets logo (canonical SVG geometry, never redrawn), Swift Orange `#F05138` as the sole primary accent, the two-tone wordmark ("Swift" white/dark + "Stash" orange), and real README code on every graphic. Read the brand book before producing or editing any branded asset; do not change those decisions without asking the maintainer.

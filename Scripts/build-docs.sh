@@ -52,6 +52,11 @@ xcrun docc process-archive transform-for-static-hosting \
     --output-path "$OUTPUT" \
     --hosting-base-path "$BASE_PATH"
 
+# DocC-Render fetches theme-settings.json from the site root at runtime; the
+# merge step does not carry it over from the catalogue, so copy it explicitly.
+# Colours follow Branding/BRANDING.md (Swift Orange accent, Ink/Ivory heroes).
+cp "$REPO_ROOT/Sources/SwiftStash/SwiftStash.docc/theme-settings.json" "$OUTPUT/theme-settings.json"
+
 # The DocC renderer's root index.html shows an empty shell; send visitors of
 # the site root straight to the synthesized landing page instead.
 cat > "$OUTPUT/index.html" <<'HTML'

@@ -1,8 +1,18 @@
 # ``SwiftStash``
 
+@Metadata {
+    @PageImage(purpose: icon, source: "technology-icon", alt: "The SwiftStash logo: a padlock between square brackets")
+}
+
+@Options(scope: local) {
+    @TopicsVisualStyle(detailedGrid)
+}
+
 Type-safe property wrappers for UserDefaults and Keychain storage with integrated logging.
 
 ## Overview
+
+![The SwiftStash lockup: a padlock between square brackets, followed by the SwiftStash wordmark](swiftstash-lockup)
 
 The SwiftStash package provides two library products with a shared storage representation:
 
@@ -11,6 +21,8 @@ The SwiftStash package provides two library products with a shared storage repre
 
 Import only the product needed by each target. A SwiftUI view may import both products when it
 uses `@Stashed` alongside core configuration or Keychain storage.
+
+![Diagram showing @Stash, @Stashed, @AppStorage, and @SecureStash flowing into UserDefaults and Keychain, with per-key AsyncStream observation from both](architecture-diagram)
 
 ### Why not just @AppStorage?
 
@@ -35,6 +47,9 @@ requires no data migration and can be done one property at a time. See
 
 > Tip: `@Stash`, `@Stashed`, and `@AppStorage` interoperate on overlapping value types and keys.
 
+For the complete symbol reference — property wrappers, type-safety markers, configuration,
+Keychain types, and the biometrics/Secure Enclave surface — see <doc:APIReference>.
+
 ## Topics
 
 ### Getting Started
@@ -55,39 +70,3 @@ requires no data migration and can be done one property at a time. See
 - <doc:KeychainConfiguration>
 - <doc:KeychainHelpers>
 - <doc:KeychainCrypto>
-
-### Property Wrappers
-
-- ``Stash``
-- ``SecureStash``
-- ``StashHandle``
-- ``SecureStashHandle``
-
-### Type Safety
-
-- ``UserDefaultsPrimitiveType``
-- ``PropertyListNativeType``
-
-### Configuration
-
-- ``SwiftStash/logLevel``
-- ``SwiftStash/configureLogging(level:)``
-- ``SwiftStash/configureUserDefaults(suiteName:)``
-- ``SwiftStash/configureKeychain(service:accessibility:isSynchronizable:itemClass:)``
-- ``StashLogLevel``
-
-### Keychain
-
-- ``KeychainManager``
-- ``KeychainAccessibility``
-- ``KeychainItemClass``
-- ``KeychainError``
-- ``SecureStashHelpers``
-
-### Biometrics & Secure Enclave
-
-- ``KeychainCryptoManagerProtocol``
-- ``CryptoKeyDescriptor``
-- ``CryptoKeyAlgorithm``
-- ``CryptoKeyStorage``
-- ``SecAccessControlFlags``

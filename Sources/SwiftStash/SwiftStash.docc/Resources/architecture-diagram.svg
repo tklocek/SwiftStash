@@ -1,0 +1,25 @@
+<svg width="900" height="400" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SwiftStash architecture: Stash, Stashed, AppStorage and SecureStash flow into UserDefaults and Keychain">
+  <rect x="0.75" y="0.75" width="898.5" height="398.5" rx="12" ry="12" fill="#F4F1EC" stroke="#D8D2C8" stroke-width="1.5"/>
+  <rect x="48" y="49" width="268" height="60" rx="10" ry="10" fill="#FFFFFF" stroke="#F05138" stroke-width="1.5"/>
+  <text x="66" y="73" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#D13A22">@Stash</text>
+  <text x="66" y="92" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="13" font-weight="400" fill="#6B7684">Foundation · any Codable</text>
+  <rect x="48" y="123" width="268" height="60" rx="10" ry="10" fill="#FFFFFF" stroke="#F05138" stroke-width="1.5"/>
+  <text x="66" y="147" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#D13A22">@Stashed</text>
+  <text x="66" y="166" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="13" font-weight="400" fill="#6B7684">SwiftUI · Binding</text>
+  <rect x="48" y="197" width="268" height="80" rx="10" ry="10" fill="none" stroke="#A8A094" stroke-width="1.5" stroke-dasharray="7 5"/>
+  <text x="66" y="221" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#8B949E">@AppStorage</text>
+  <text x="66" y="240" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="13" font-weight="400" fill="#6B7684">SwiftUI · plist only</text>
+  <text x="66" y="259" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="12" font-weight="400" fill="#6B7684">same data representation → zero migration</text>
+  <rect x="48" y="291" width="268" height="60" rx="10" ry="10" fill="#FFFFFF" stroke="#D13A22" stroke-width="1.5"/>
+  <text x="66" y="315" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#B5320F">@SecureStash</text>
+  <text x="66" y="334" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="13" font-weight="400" fill="#6B7684">Foundation · secrets</text>
+  <svg x="340" y="49" width="220" height="302" viewBox="0 0 220 325" preserveAspectRatio="none"><path d="M0 21 C 80 21, 120 84, 196 84" stroke="#F05138" stroke-width="2.5" fill="none"/><path d="M0 102 C 80 102, 120 84, 196 84" stroke="#F05138" stroke-width="2.5" fill="none"/><path d="M0 190 C 90 190, 130 88, 192 85" stroke="#A8A094" stroke-width="2.5" stroke-dasharray="6 5" fill="none"/><path d="M0 278 C 90 278, 130 179, 196 179" stroke="#D13A22" stroke-width="2.5" fill="none"/><path d="M196 78 l16 6 -16 6 z" fill="#F05138"/><path d="M196 173 l16 6 -16 6 z" fill="#D13A22"/></svg>
+  <rect x="584" y="94" width="268" height="74" rx="10" ry="10" fill="#FFFFFF" stroke="#D8D2C8" stroke-width="1.5"/>
+  <text x="604" y="122" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="17" font-weight="700" fill="#0757A8">UserDefaults</text>
+  <text x="604" y="144" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="13" font-weight="400" fill="#6B7684">preferences, app state</text>
+  <rect x="584" y="188" width="268" height="74" rx="10" ry="10" fill="#FFFFFF" stroke="#D8D2C8" stroke-width="1.5"/>
+  <text x="604" y="216" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="17" font-weight="700" fill="#1A7F37">Keychain</text>
+  <text x="604" y="238" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="13" font-weight="400" fill="#6B7684">tokens, passwords, Secure Enclave</text>
+  <g transform="translate(588,284)"><circle cx="8" cy="8" r="6" fill="none" stroke="#D13A22" stroke-width="2"/><path d="M8 5v3l2 2" stroke="#D13A22" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+  <text x="612" y="296" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="13" font-weight="400" fill="#6B7684">per-key AsyncStream from both backends</text>
+</svg>

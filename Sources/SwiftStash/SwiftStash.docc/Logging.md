@@ -1,5 +1,9 @@
 # Logging
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-logging", alt: "Logging")
+}
+
 Configure logging to debug and monitor storage operations.
 
 ## Overview

@@ -1,5 +1,9 @@
 # Keychain Storage with @SecureStash
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-keychain", alt: "Keychain Storage")
+}
+
 Store sensitive data securely in the system Keychain on Apple platforms.
 
 ## Overview
