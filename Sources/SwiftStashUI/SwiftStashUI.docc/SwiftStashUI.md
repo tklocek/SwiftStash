@@ -1,8 +1,14 @@
 # ``SwiftStashUI``
 
+@Metadata {
+    @PageImage(purpose: icon, source: "technology-icon-ui", alt: "The SwiftStash logo: a padlock between square brackets")
+}
+
 SwiftUI bindings for SwiftStash — the `@Stashed` dynamic property keeps views synchronised with UserDefaults.
 
 ## Overview
+
+![The SwiftStash lockup: a padlock between square brackets, followed by the SwiftStash wordmark](swiftstash-lockup)
 
 `SwiftStashUI` is the SwiftUI-facing product of the SwiftStash package. Its single
 public symbol, ``Stashed``, is a `DynamicProperty` that persists a value in

@@ -1,5 +1,9 @@
 # SwiftUI Storage with @Stashed
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-swiftui", alt: "SwiftUI Storage")
+}
+
 Persist a value and keep a SwiftUI view synchronised with changes to its UserDefaults key.
 
 ## Choose an Initialiser

@@ -1,0 +1,17 @@
+<svg width="720" height="220" viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SwiftStash package products: SwiftStash (Foundation) and SwiftStashUI (SwiftUI)">
+  <rect x="0.75" y="0.75" width="718.5" height="218.5" rx="12" ry="12" fill="#0D1117" stroke="#3D4450" stroke-width="1.5"/>
+  <rect x="40" y="17.0" width="262" height="186" rx="10" ry="10" fill="#12161F" stroke="#F05138" stroke-width="1.5"/>
+  <text x="64" y="57.0" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="19" font-weight="700" fill="#FFFFFF">Swift<tspan fill="#F05138">Stash</tspan><tspan fill="#F05138"></tspan></text>
+  <text x="64" y="83.0" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="13" font-weight="400" fill="#8B949E">Foundation — no SwiftUI dependency</text>
+  <rect x="64" y="101.0" width="59.2" height="22" rx="5" ry="5" fill="#0D1117" stroke="#3D4450"/><text x="93.6" text-anchor="middle" y="116.0" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="600" fill="#FF7AB2">@Stash</text>
+  <rect x="131.2" y="101.0" width="102.4" height="22" rx="5" ry="5" fill="#0D1117" stroke="#3D4450"/><text x="182.39999999999998" text-anchor="middle" y="116.0" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="600" fill="#F2994A">@SecureStash</text>
+  <rect x="64" y="131.0" width="124.0" height="22" rx="5" ry="5" fill="#0D1117" stroke="#3D4450"/><text x="126.0" text-anchor="middle" y="146.0" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="600" fill="#79C0FF">KeychainManager</text>
+  <rect x="64" y="161.0" width="95.2" height="22" rx="5" ry="5" fill="#0D1117" stroke="#3D4450"/><text x="111.6" text-anchor="middle" y="176.0" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="600" fill="#7EE787">StashHandle</text>
+  <rect x="418" y="47.0" width="262" height="126" rx="10" ry="10" fill="#12161F" stroke="#F2994A" stroke-width="1.5"/>
+  <text x="442" y="87.0" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="19" font-weight="700" fill="#FFFFFF">Swift<tspan fill="#F05138">Stash</tspan><tspan fill="#F2994A">UI</tspan></text>
+  <text x="442" y="113.0" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="13" font-weight="400" fill="#8B949E">SwiftUI — DynamicProperty + Binding</text>
+  <rect x="442" y="131.0" width="73.6" height="22" rx="5" ry="5" fill="#0D1117" stroke="#3D4450"/><text x="478.8" text-anchor="middle" y="146.0" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="600" fill="#FF7AB2">@Stashed</text>
+  <rect x="523.6" y="131.0" width="73.6" height="22" rx="5" ry="5" fill="#0D1117" stroke="#3D4450"/><text x="560.4" text-anchor="middle" y="146.0" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" font-weight="600" fill="#79C0FF">$binding</text>
+  <path d="M384 110.0 H338" stroke="#F2994A" stroke-width="2.5"/>
+  <path d="M344 103.0 l-9 7 9 7" stroke="#F2994A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

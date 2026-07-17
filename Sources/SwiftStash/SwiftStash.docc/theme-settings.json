@@ -1,0 +1,26 @@
+{
+  "theme": {
+    "color": {
+      "documentation-intro-fill": {
+        "light": "linear-gradient(180deg, #F4F1EC 0%, #EDE8E0 100%)",
+        "dark": "linear-gradient(180deg, #12161F 0%, #0D1117 100%)"
+      },
+      "documentation-intro-title": {
+        "light": "#1C1E21",
+        "dark": "#FFFFFF"
+      },
+      "documentation-intro-eyebrow": {
+        "light": "#D13A22",
+        "dark": "#F2994A"
+      },
+      "documentation-intro-figure": {
+        "light": "#1C1E21",
+        "dark": "#C8D0D9"
+      },
+      "documentation-intro-accent": {
+        "light": "#F05138",
+        "dark": "#F05138"
+      }
+    }
+  }
+}

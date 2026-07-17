@@ -1,6 +1,12 @@
 # Package Products
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-products", alt: "Package Products")
+}
+
 Choose the smallest SwiftStash product that matches the target's responsibilities.
+
+![Diagram showing the SwiftStash product (Foundation, no SwiftUI dependency) and the SwiftStashUI product (SwiftUI, DynamicProperty + Binding)](products-diagram)
 
 ## SwiftStash
 

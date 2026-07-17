@@ -1,5 +1,9 @@
 # Keychain Configuration
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-keychain-configuration", alt: "Keychain Configuration")
+}
+
 Advanced configuration options for @SecureStash.
 
 ## Overview

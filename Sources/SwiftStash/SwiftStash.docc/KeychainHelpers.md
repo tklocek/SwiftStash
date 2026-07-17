@@ -1,5 +1,9 @@
 # Keychain Helpers
 
+@Metadata {
+    @PageImage(purpose: card, source: "card-keychain-helpers", alt: "Keychain Helpers")
+}
+
 Utility methods for managing keychain items.
 
 ## Overview

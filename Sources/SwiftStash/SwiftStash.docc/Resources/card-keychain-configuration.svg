@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="Keychain Configuration">
+  <defs>
+    <linearGradient id="bgL" x1="0.26" y1="0" x2="0.74" y2="1">
+      <stop offset="0" stop-color="#ffffff"></stop><stop offset="0.55" stop-color="#faf8f4"></stop><stop offset="1" stop-color="#f4f1ec"></stop>
+    </linearGradient>
+    <radialGradient id="glowL">
+      <stop offset="0" stop-color="#f05138" stop-opacity="0.1"></stop><stop offset="0.7" stop-color="#f05138" stop-opacity="0"></stop><stop offset="1" stop-color="#f05138" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  <rect x="0.5" y="0.5" width="639" height="359" rx="12" fill="url(#bgL)" stroke="#d8d2c8"></rect>
+  <ellipse cx="320" cy="137" rx="210" ry="160" fill="url(#glowL)"></ellipse>
+  <g transform="translate(254 69.1) scale(1.375)">
+    <path d="M42.5 26.7 A 22 22 0 0 1 44.2 26.3 L 44.7 17.2 L 51.3 17.2 L 51.8 26.3 A 22 22 0 0 1 59.2 29.0 A 22 22 0 0 1 60.6 30.0 L 67.4 23.8 L 72.2 28.6 L 66.0 35.4 A 22 22 0 0 1 69.3 42.5 A 22 22 0 0 1 69.7 44.2 L 78.8 44.7 L 78.8 51.3 L 69.7 51.8 A 22 22 0 0 1 67.0 59.2 A 22 22 0 0 1 66.0 60.6 L 72.2 67.4 L 67.4 72.2 L 60.6 66.0 A 22 22 0 0 1 53.5 69.3 A 22 22 0 0 1 51.8 69.7 L 51.3 78.8 L 44.7 78.8 L 44.2 69.7 A 22 22 0 0 1 36.8 67.0 A 22 22 0 0 1 35.4 66.0 L 28.6 72.2 L 23.8 67.4 L 30.0 60.6 A 22 22 0 0 1 26.7 53.5 A 22 22 0 0 1 26.3 51.8 L 17.2 51.3 L 17.2 44.7 L 26.3 44.2 A 22 22 0 0 1 29.0 36.8 A 22 22 0 0 1 30.0 35.4 L 23.8 28.6 L 28.6 23.8 L 35.4 30.0 Z" stroke="#f05138" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="48" cy="48" r="10" stroke="#d13a22" stroke-width="5" fill="none"></circle>
+  </g>
+  <text x="320" y="255.6" text-anchor="middle" font-family="-apple-system,&#39;SF Pro Display&#39;,&#39;Segoe UI&#39;,sans-serif" font-size="30" font-weight="600" letter-spacing="-0.6" fill="#1a1d23">Keychain Configuration</text>
+  <text x="320" y="284.1" text-anchor="middle" font-family="-apple-system,&#39;SF Pro Display&#39;,&#39;Segoe UI&#39;,sans-serif" font-size="15" letter-spacing="-0.075" fill="#6b7684">Advanced configuration options for @SecureStash.</text>
+</svg>

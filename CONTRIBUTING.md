@@ -1,9 +1,8 @@
 # Contributing to SwiftStash
 
 Thanks for helping! Issues and pull requests are welcome. This file covers the
-practical bits; `AGENTS.md` is the full operational reference (layout, API
-decision tables, pitfalls) for both humans and AI coding agents — read it before
-making non-trivial changes.
+practical bits. Public API guidance lives in the published DocC documentation;
+`AGENTS.md` is the deeper local operational reference for non-trivial changes.
 
 ## Getting started
 
@@ -12,6 +11,7 @@ git clone https://github.com/tklocek/SwiftStash.git
 cd SwiftStash
 swift build
 swift test
+./Templates/check.sh
 ```
 
 The example app doubles as the compile check for `SwiftStashUI` consumers —
@@ -37,7 +37,8 @@ cd Example && xcodebuild -project SwiftStashExample.xcodeproj \
 - **Storage representation is `@AppStorage`-compatible** — changing how a value
   type is persisted is a breaking change for existing users' data; don't.
 - **Public API needs DocC** — update `Sources/SwiftStash/SwiftStash.docc/` when
-  adding public symbols.
+  adding public symbols. The GitHub Pages site is built by `Scripts/build-docs.sh`
+  from every commit to `main`.
 
 ## Tests
 
