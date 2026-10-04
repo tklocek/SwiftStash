@@ -10,7 +10,7 @@ import Foundation
 import Testing
 import SwiftUI
 @testable import SwiftStash
-import SwiftStashUI
+@testable import SwiftStashUI
 
 // MARK: - Keys
 
@@ -215,9 +215,11 @@ struct StashKeyTests {
         #expect(model.wrappedValue == 7)
         #expect(view.wrappedValue == 7)
 
+        let delivered = values(of: view.currentValues)
         model.wrappedValue = 9
+
         // The view's shared observer learns of the model's write through KVO, debounced.
-        #expect(await waitUntil { view.wrappedValue == 9 })
+        #expect(await delivered.firstValue { $0 == 9 } == 9)
     }
 
     @Test
@@ -262,7 +264,7 @@ struct StashKeyTests {
             let probe: StashedProbe
 
             var body: some View {
-                probe.record(count, binding: $count)
+                probe.record(count, binding: $count, values: _count.currentValues)
                 return Text("\(count)")
             }
         }

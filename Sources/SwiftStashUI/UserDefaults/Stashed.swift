@@ -70,6 +70,15 @@ public struct Stashed<Value: Sendable>: DynamicProperty {
         )
     }
 
+    /// The values this wrapper publishes to SwiftUI: the current one, then each change.
+    ///
+    /// Internal so tests can await a delivery — a write through another wrapper, or from outside
+    /// the process, reaches `@Stashed` through KVO and a debounce — instead of waiting for time
+    /// to pass.
+    var currentValues: AnyPublisher<Value, Never> {
+        resolution.observer.$currentValue.eraseToAnyPublisher()
+    }
+
     /// Resolves the store from the environment before SwiftUI renders the view's body.
     public nonisolated func update() {
         MainActor.assumeIsolated {

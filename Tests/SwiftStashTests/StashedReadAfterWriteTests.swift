@@ -111,7 +111,7 @@ struct StashedReadAfterWriteTests {
     }
 
     @Test
-    func `Hosted view never renders the assigned nil`() async {
+    func `Hosted view never renders the assigned nil`() {
         let (userDefaults, cleanup) = makeUserDefaults(suiteName: "readAfterWrite.hosted.\(UUID().uuidString)")
         defer { cleanup() }
         userDefaults.set(7, forKey: "hostedOptionalWithDefault")
@@ -121,8 +121,7 @@ struct StashedReadAfterWriteTests {
         #expect(log.values.last == 7)
 
         log.binding?.wrappedValue = nil
-        // Long enough for the debounced change notification to arrive as well.
-        await host.settle()
+        host.render()
 
         #expect(log.values.last == 5)
         #expect(log.values.contains(Optional<Int>.none) == false)

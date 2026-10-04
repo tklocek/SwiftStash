@@ -30,24 +30,6 @@ import SwiftStashUI
 /// every other keychain test (`runWithMockBackend`) and reset in a defer.
 struct ConfigurationTests {
 
-    /// Whether `stream` yields within `seconds`. A stream on the wrong store never yields,
-    /// so waiting without a limit would hang the run instead of failing the test.
-    private static func yields(_ stream: AsyncStream<Void>, within seconds: Double = 2) async -> Bool {
-        await withTaskGroup(of: Bool.self) { group in
-            group.addTask {
-                var iterator = stream.makeAsyncIterator()
-                return await iterator.next() != nil
-            }
-            group.addTask {
-                try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-                return false
-            }
-            let first = await group.next() ?? false
-            group.cancelAll()
-            return first
-        }
-    }
-
     /// Points the application level at a throwaway suite, so a scope regression writes
     /// there instead of into the test runner's `.standard`.
     private static func configureThrowawayApplicationStore() -> @Sendable () -> Void {
@@ -115,7 +97,7 @@ struct ConfigurationTests {
 
             let updates = SwiftStash.updates(forKey: "instanceUpdates")
             suite.set(3, forKey: "instanceUpdates")
-            #expect(await Self.yields(updates))
+            #expect(await updates.firstValue { _ in true } != nil)
         }
     }
 
@@ -217,7 +199,7 @@ struct ConfigurationTests {
 
             let updates = SwiftStash.updates(forKey: TestScopedKey.counter)
             scoped.set(9, forKey: "counter")
-            #expect(await Self.yields(updates))
+            #expect(await updates.firstValue { _ in true } != nil)
         }
     }
 
