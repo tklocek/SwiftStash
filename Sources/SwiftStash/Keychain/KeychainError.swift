@@ -131,7 +131,8 @@ public enum KeychainError: LocalizedError, Sendable, Equatable {
     /// Complete list of codes is here: [Apple Security Result Codes](https://developer.apple.com/documentation/security/security-framework-result-codes)
     public init(fromOSStatus status: OSStatus) {
         self = switch status {
-            // errSecSuccess: is not an error, but Apple use this code as a Success. Should be handle separately!
+            // Callers convert only failing statuses; a success passed in by mistake becomes
+            // `.unexpected` instead of a trap.
             case errSecSuccess: .unexpected(status)
             
             case errSecDataTooLarge: .invalidData

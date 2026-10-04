@@ -651,11 +651,9 @@ struct StashedTests {
         
         let binding = sut.$intValue
         
-        // Update via binding
         binding.wrappedValue = 50
         #expect(sut.intValue == 50)
         
-        // Update via property
         sut.intValue = 75
         #expect(binding.wrappedValue == 75)
     }
@@ -741,7 +739,6 @@ struct StashedTests {
         let (userDefaults, cleanup) = makeUserDefaults(suiteName: "stashed.enum.invalid")
         defer { cleanup() }
         
-        // Store an invalid raw value
         userDefaults.set("invalid_theme", forKey: "stashedTheme")
         
         let sut = StashedTestView(userDefaults: userDefaults)

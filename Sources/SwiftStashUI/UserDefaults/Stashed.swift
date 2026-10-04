@@ -521,7 +521,6 @@ fileprivate final class StashedObserver<Value: Sendable>: ObservableObject {
         _currentValue = Published(initialValue: initialValue)
         self.currentValue = initialValue
         
-        // Listen for external changes to UserDefaults
         StashNotificationCenter.shared
             .publisher(for: storage.key, in: storage.store)
             .debounceForStash()

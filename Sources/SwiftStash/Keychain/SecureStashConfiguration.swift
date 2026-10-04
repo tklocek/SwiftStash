@@ -22,7 +22,6 @@ final class SecureStashConfiguration: @unchecked Sendable {
     
     private let lock = NSLock()
     
-    // Global defaults (all optional)
     private var _service: String?
     private var _accessibility: KeychainAccessibility?
     private var _isSynchronizable: Bool?

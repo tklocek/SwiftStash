@@ -423,7 +423,6 @@ struct SecureStashTests {
             #expect(deletedCount == 2)
             #expect(SecureStashHelpers.exists(key: "k1", service: service) == false)
             #expect(SecureStashHelpers.exists(key: "k2", service: service) == false)
-            // Other services are untouched.
             #expect(SecureStashHelpers.exists(key: "k3", service: otherService))
         }
     }

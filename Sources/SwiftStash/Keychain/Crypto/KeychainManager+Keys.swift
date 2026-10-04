@@ -59,7 +59,6 @@ extension KeychainManager {
     ) throws(KeychainError) -> SecKey {
         let algorithm = descriptor.algorithm ?? .ec
 
-        // Validate: Secure Enclave only supports EC.
         if case .secureEnclave = storage, algorithm != .ec {
             throw KeychainError.secureEnclaveAlgorithmInvalid
         }
