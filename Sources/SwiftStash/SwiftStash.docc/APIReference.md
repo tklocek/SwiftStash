@@ -16,6 +16,10 @@ markers, configuration, Keychain types, and the biometrics/Secure Enclave surfac
 - ``StashHandle``
 - ``SecureStashHandle``
 
+### Keys
+
+- ``StashKey``
+
 ### Type Safety
 
 - ``UserDefaultsPrimitiveType``

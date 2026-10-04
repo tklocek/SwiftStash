@@ -66,9 +66,13 @@ package struct OptionalRawRepresentableUserDefaultsStorage<Wrapped: RawRepresent
 
     package let key: String
     package let store: UserDefaults
-    package init(key: String, userDefaults: UserDefaults) {
+    /// Returned when the key is absent or invalid; `nil` unless a `StashKey` supplies one.
+    private let defaultValue: Wrapped?
+
+    package init(key: String, userDefaults: UserDefaults, defaultValue: Wrapped? = nil) {
         self.key = key
         self.store = userDefaults
+        self.defaultValue = defaultValue
     }
 
     package func get() -> Wrapped? {
@@ -78,11 +82,11 @@ package struct OptionalRawRepresentableUserDefaultsStorage<Wrapped: RawRepresent
         guard let rawValue = object as? Wrapped.RawValue,
               let value = Wrapped(rawValue: rawValue) else {
             if object != nil {
-                Logging.logOperation("GET (invalid raw value, returning nil)", key: key, type: typeName)
+                Logging.logOperation("GET (invalid raw value, returning default)", key: key, type: typeName)
             } else {
-                Logging.logOperation("GET (not set, returning nil)", key: key, type: typeName)
+                Logging.logOperation("GET (not set, returning default)", key: key, type: typeName)
             }
-            return nil
+            return defaultValue
         }
 
         Logging.logOperation("GET", key: key, type: typeName)
@@ -103,6 +107,8 @@ package struct OptionalRawRepresentableUserDefaultsStorage<Wrapped: RawRepresent
 }
 
 // `@unchecked` because `UserDefaults` is documented as thread-safe but not annotated
-// `Sendable` in the SDK. The only other stored property is an immutable `String`.
+// `Sendable` in the SDK. The other stored properties are an immutable `String` and the
+// default value: `Wrapped?` is the `Value` of a `Stash`/`Stashed`, which requires
+// `Value: Sendable` (and `Optional` is `Sendable` only when `Wrapped` is).
 extension OptionalRawRepresentableUserDefaultsStorage: @unchecked Sendable {}
 

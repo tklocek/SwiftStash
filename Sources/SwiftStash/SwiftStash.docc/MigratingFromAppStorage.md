@@ -70,6 +70,10 @@ enum SettingsKey: String {
 Every SwiftStash initialiser accepts these typed keys directly:
 `@Stash(SettingsKey.username) var username = ""`.
 
+When a model and a view read the same preference, declare its default once with a ``StashKey``
+(`extension StashKey<String> { static var username: Self { .init(SettingsKey.username, default: "") } }`)
+and write `@Stash(.username) var username: String` and `@Stashed(.username) var username: String`.
+
 > Important: Keys containing dots (`.`) keep working for storage, but cannot be observed with
 > `updates` streams — KVO interprets dots as key paths. Rename the key only if you need
 > observation and can afford losing the previously stored value.

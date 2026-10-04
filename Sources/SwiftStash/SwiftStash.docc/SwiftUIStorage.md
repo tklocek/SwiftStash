@@ -24,7 +24,12 @@ The `codable:` initialisers accept an optional `encoder:`/`decoder:` pair for
 non-default JSON strategies, exactly like `@Stash(codable:)` — see
 <doc:UserDefaultsStorage> for the details.
 
-All initialisers also accept a `RawRepresentable<String>` key.
+All initialisers also accept a `RawRepresentable<String>` key, and a ``StashKey`` that carries
+its default, so a view and a model declared with the same key cannot disagree on it:
+
+```swift
+@Stashed(.launchCount) private var launchCount: Int     // StashKey<Int>, default declared once
+```
 
 ## Choose the Store
 
