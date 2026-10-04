@@ -8,6 +8,10 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ### Added
 
+- `StashObservable` (iOS 17, macOS 14 and later): an `@Observable` class conforming to it
+  can mark its stashes `@ObservationIgnored @Stash(…)`, and their reads and writes take part in
+  observation — no observable mirror, no restore at launch. Writes that bypass the class, such
+  as a `@Stashed` in a settings view, notify its observers too.
 - `StashContainer` and `StashStore`: a class states its UserDefaults store once
   (`let stashStore: StashStore`), and every `@Stash` property declared in it — and its
   projected value — reads and writes that store, so a test injects its suite without passing

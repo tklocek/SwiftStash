@@ -45,10 +45,11 @@ markers, configuration, Keychain types, and the biometrics/Secure Enclave surfac
 - ``StashScope``
 - ``StashScopedKey``
 
-### Containers
+### Containers and Observation
 
 - ``StashContainer``
 - ``StashStore``
+- ``StashObservable``
 
 ### Keychain
 
