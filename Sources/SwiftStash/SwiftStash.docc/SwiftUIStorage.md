@@ -24,13 +24,43 @@ The `codable:` initialisers accept an optional `encoder:`/`decoder:` pair for
 non-default JSON strategies, exactly like `@Stash(codable:)` — see
 <doc:UserDefaultsStorage> for the details.
 
+All initialisers also accept a `RawRepresentable<String>` key.
+
+## Choose the Store
+
 An explicit UserDefaults instance uses the `store:` label, mirroring `@AppStorage`:
 
 ```swift
 @Stashed("theme", store: sharedDefaults) var theme: Theme = .system
 ```
 
-All initialisers also accept a `RawRepresentable<String>` key.
+Without it, a hosted `@Stashed` takes its store from the SwiftUI environment, the way
+`@AppStorage` honours `.defaultAppStorage(_:)`. Set it with `.stashStore(_:)` — typically next
+to `.defaultAppStorage(_:)`, so a test or preview keeps the whole hierarchy on its own suite
+and never reads or writes the app's real preferences:
+
+```swift
+SettingsView()
+    .defaultAppStorage(testDefaults)
+    .stashStore(testDefaults)
+```
+
+The store resolves in this order:
+
+1. an explicit `store:` argument;
+2. the environment: `.stashStore(_:for:)` for the key's ``StashScope``, then `.stashStore(_:)`,
+   which covers every wrapper below it, scoped ones included;
+3. the store configured for the key's scope, `SwiftStash.configureUserDefaults(_:for:)`;
+4. the application-level store, `SwiftStash.configureUserDefaults(_:)`, else `.standard`.
+
+The modifier nearest the view wins: `.stashStore(_:)` replaces any stores set further up,
+scoped ones included, while `.stashStore(_:for:)` redirects only its scope. When the
+environment's store changes, the wrapper switches to the new store before the next render.
+
+Steps 3 and 4 are read when the wrapper is created. A `@Stashed` used outside a view
+hierarchy — read directly from a view struct, as in unit tests — has no environment and uses
+them. The environment never reaches `@Stash`, which has no view: a view model's `@Stash` keeps
+the store it resolved, so inject the store there explicitly (`userDefaults:`).
 
 ## Bind Controls
 

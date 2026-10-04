@@ -16,13 +16,15 @@ public extension Stash {
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
     ///   - defaultValue: The default value to return if no value is stored.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     init(
         key: some RawRepresentable<String>,
         defaultValue: Value,
         userDefaults: UserDefaults? = nil
     ) where Value: UserDefaultsPrimitiveType {
-        self.init(key: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults)
+        self.init(key: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
     }
 
     /// Creates a property wrapper for storing primitive values in UserDefaults
@@ -30,13 +32,15 @@ public extension Stash {
     /// - Parameters:
     ///   - wrappedValue: The default value to return if no value is stored.
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     init(
         wrappedValue: Value,
         _ key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) where Value: UserDefaultsPrimitiveType {
-        self.init(key: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults)
+        self.init(key: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
     }
 }
 
@@ -47,24 +51,28 @@ public extension Stash where Value: ExpressibleByNilLiteral & UserDefaultsPrimit
     /// using a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     init(
         key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, userDefaults: userDefaults)
+        self.init(key: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
     }
 
     /// Creates a property wrapper for storing optional primitive values in UserDefaults
     /// using `@AppStorage`-style syntax with a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     init(
         _ key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, userDefaults: userDefaults)
+        self.init(key: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
     }
 }
 
@@ -76,7 +84,9 @@ public extension Stash where Value: Codable {
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
     ///   - defaultValue: The default value to return if no value is stored or decoding fails.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     ///   - encoder: Custom JSON encoder (defaults to a standard `JSONEncoder`). Configure it
     ///     fully before passing it in; the wrapper keeps using this instance, so it must not
     ///     be mutated afterwards.
@@ -89,7 +99,7 @@ public extension Stash where Value: Codable {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        self.init(codable: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults, encoder: encoder, decoder: decoder)
+        self.init(codable: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults ?? Self.scopedStore(for: key), encoder: encoder, decoder: decoder)
     }
 
     /// Creates a property wrapper for storing Codable types in UserDefaults using JSON encoding
@@ -97,7 +107,9 @@ public extension Stash where Value: Codable {
     /// - Parameters:
     ///   - wrappedValue: The default value to return if no value is stored or decoding fails.
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     ///   - encoder: Custom JSON encoder (defaults to a standard `JSONEncoder`). Configure it
     ///     fully before passing it in; the wrapper keeps using this instance, so it must not
     ///     be mutated afterwards.
@@ -110,7 +122,7 @@ public extension Stash where Value: Codable {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        self.init(codable: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults, encoder: encoder, decoder: decoder)
+        self.init(codable: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults ?? Self.scopedStore(for: key), encoder: encoder, decoder: decoder)
     }
 }
 
@@ -121,7 +133,9 @@ public extension Stash where Value: Codable & ExpressibleByNilLiteral {
     /// using a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     ///   - encoder: Custom JSON encoder (defaults to a standard `JSONEncoder`). Configure it
     ///     fully before passing it in; the wrapper keeps using this instance, so it must not
     ///     be mutated afterwards.
@@ -133,7 +147,7 @@ public extension Stash where Value: Codable & ExpressibleByNilLiteral {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        self.init(codable: key.rawValue, userDefaults: userDefaults, encoder: encoder, decoder: decoder)
+        self.init(codable: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key), encoder: encoder, decoder: decoder)
     }
 }
 
@@ -145,13 +159,15 @@ public extension Stash where Value: RawRepresentable, Value.RawValue: PropertyLi
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
     ///   - defaultValue: The default value to return if no value is stored or conversion fails.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     init(
         key: some RawRepresentable<String>,
         defaultValue: Value,
         userDefaults: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults)
+        self.init(key: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
     }
 
     /// Creates a property wrapper for storing RawRepresentable types (like enums) in UserDefaults
@@ -159,13 +175,15 @@ public extension Stash where Value: RawRepresentable, Value.RawValue: PropertyLi
     /// - Parameters:
     ///   - wrappedValue: The default value to return if no value is stored or conversion fails.
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     init(
         wrappedValue: Value,
         _ key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults)
+        self.init(key: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
     }
 }
 
@@ -176,23 +194,37 @@ public extension Stash {
     /// using a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     init<Wrapped>(
         key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
-        self.init(key: key.rawValue, userDefaults: userDefaults)
+        self.init(key: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
     }
 
     /// Creates a property wrapper for storing optional RawRepresentable types in UserDefaults
     /// using `@AppStorage`-style syntax with a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - userDefaults: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for
+    ///     the key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     init<Wrapped>(
         _ key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
-        self.init(key: key.rawValue, userDefaults: userDefaults)
+        self.init(key: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
+    }
+}
+
+// MARK: - Scope
+
+private extension Stash {
+    /// The configured store for a key whose type declares a ``StashScope``; `nil` leaves
+    /// the wrapper on the application-level store.
+    static func scopedStore(for key: some RawRepresentable<String>) -> UserDefaults? {
+        StashScope.of(key).map { StashConfiguration.shared.resolveUserDefaults(for: $0) }
     }
 }

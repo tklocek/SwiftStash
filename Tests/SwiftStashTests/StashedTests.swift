@@ -10,6 +10,7 @@ import Foundation
 import Testing
 import SwiftUI
 @testable import SwiftStashUI
+import SwiftStash
 
 /// Comprehensive tests for @Stashed property wrapper.
 ///
@@ -69,31 +70,38 @@ struct StashedTests {
     }
 
     @Test
-    func `AppStorage-style Stashed declaration works for default and optional primitive values`() {
-        let key1 = "appStorageStyle.stashed.int"
-        let key2 = "appStorageStyle.stashed.optionalInt"
-        defer {
-            UserDefaults.standard.removeObject(forKey: key1)
-            UserDefaults.standard.removeObject(forKey: key2)
+    func `AppStorage-style Stashed declaration works for default and optional primitive values`() async {
+        // The store-less declaration resolves the configured store; configuring it is
+        // process-global, hence the exit test.
+        await #expect(processExitsWith: .success) {
+            let suiteName = "swiftstash.tests.appStorageStyle.stashed.\(UUID().uuidString)"
+            defer { UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName) }
+            SwiftStash.configureUserDefaults(suiteName: suiteName)
+
+            await MainActor.run {
+                struct AppStorageStyleView: View {
+                    @Stashed("appStorageStyle.stashed.int") var value: Int = 9
+                    @Stashed("appStorageStyle.stashed.optionalInt") var optionalValue: Int?
+
+                    var body: some View { EmptyView() }
+                }
+
+                let sut = AppStorageStyleView()
+
+                #expect(sut.value == 9)
+                #expect(sut.optionalValue == nil)
+
+                sut.value = 42
+                sut.optionalValue = 7
+
+                #expect(sut.value == 42)
+                #expect(sut.optionalValue == 7)
+            }
+
+            let suite = UserDefaults(suiteName: suiteName)!
+            #expect(suite.integer(forKey: "appStorageStyle.stashed.int") == 42)
+            #expect(suite.integer(forKey: "appStorageStyle.stashed.optionalInt") == 7)
         }
-
-        struct AppStorageStyleView: View {
-            @Stashed("appStorageStyle.stashed.int") var value: Int = 9
-            @Stashed("appStorageStyle.stashed.optionalInt") var optionalValue: Int?
-
-            var body: some View { EmptyView() }
-        }
-
-        let sut = AppStorageStyleView()
-
-        #expect(sut.value == 9)
-        #expect(sut.optionalValue == nil)
-
-        sut.value = 42
-        sut.optionalValue = 7
-
-        #expect(sut.value == 42)
-        #expect(sut.optionalValue == 7)
     }
     
     @Test

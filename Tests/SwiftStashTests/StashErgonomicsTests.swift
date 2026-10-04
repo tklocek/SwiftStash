@@ -227,27 +227,34 @@ struct StashErgonomicsTests {
     }
 
     @Test
-    func `AppStorage-style Stash declaration works with a key enum`() {
-        defer {
-            UserDefaults.standard.removeObject(forKey: TestSettingsKey.launchCount.rawValue)
-            UserDefaults.standard.removeObject(forKey: TestSettingsKey.username.rawValue)
+    func `AppStorage-style Stash declaration works with a key enum`() async {
+        // The store-less declaration resolves the configured store; configuring it is
+        // process-global, hence the exit test.
+        await #expect(processExitsWith: .success) {
+            let suiteName = "swiftstash.tests.appStorageStyle.keyEnum.\(UUID().uuidString)"
+            defer { UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName) }
+            SwiftStash.configureUserDefaults(suiteName: suiteName)
+
+            struct AppStorageStyleStorage {
+                @Stash(TestSettingsKey.launchCount) var count: Int = 9
+                @Stash(TestSettingsKey.username) var username: String?
+            }
+
+            let sut = AppStorageStyleStorage()
+
+            #expect(sut.count == 9)
+            #expect(sut.username == nil)
+
+            sut.count = 42
+            sut.username = "tomek"
+
+            #expect(sut.count == 42)
+            #expect(sut.username == "tomek")
+
+            let suite = UserDefaults(suiteName: suiteName)!
+            #expect(suite.integer(forKey: TestSettingsKey.launchCount.rawValue) == 42)
+            #expect(suite.string(forKey: TestSettingsKey.username.rawValue) == "tomek")
         }
-
-        struct AppStorageStyleStorage {
-            @Stash(TestSettingsKey.launchCount) var count: Int = 9
-            @Stash(TestSettingsKey.username) var username: String?
-        }
-
-        let sut = AppStorageStyleStorage()
-
-        #expect(sut.count == 9)
-        #expect(sut.username == nil)
-
-        sut.count = 42
-        sut.username = "tomek"
-
-        #expect(sut.count == 42)
-        #expect(sut.username == "tomek")
     }
 
     @Test

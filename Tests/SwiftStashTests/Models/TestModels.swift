@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftStash
 
 // MARK: - User Profile Models
 
@@ -61,4 +62,25 @@ enum Priority: Int, Sendable {
     case medium = 2
     case high = 3
     case critical = 4
+}
+
+// MARK: - Scopes
+
+extension StashScope {
+    /// A scope used by tests of scoped key types.
+    static let testScope = StashScope("SwiftStashTests.scope")
+    /// A second scope, for tests of two scopes sharing a key.
+    static let otherTestScope = StashScope("SwiftStashTests.otherScope")
+}
+
+/// A key type whose keys belong to ``StashScope/testScope``.
+enum TestScopedKey: String, StashScopedKey {
+    case counter
+    static var stashScope: StashScope { .testScope }
+}
+
+/// A key type in ``StashScope/otherTestScope`` with the same raw key as ``TestScopedKey``.
+enum OtherTestScopedKey: String, StashScopedKey {
+    case counter
+    static var stashScope: StashScope { .otherTestScope }
 }

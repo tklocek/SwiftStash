@@ -31,7 +31,9 @@ struct SettingsView: View {
 The initialisers follow the same type rules as `@Stash`: property-list primitives
 and raw-representable enums use the positional or `key:defaultValue:` forms, any
 other `Codable` value uses `codable:`, and optionals omit the default. An explicit
-UserDefaults instance is passed via `store:`, mirroring `@AppStorage`.
+UserDefaults instance is passed via `store:`, mirroring `@AppStorage`; without one, a
+hosted wrapper takes its store from the environment, set with `.stashStore(_:)` — the
+counterpart of `.defaultAppStorage(_:)`.
 
 The full usage guide — initialiser table, binding patterns, observation
 behaviour, and concurrency notes — lives in the SwiftUI Storage article of the

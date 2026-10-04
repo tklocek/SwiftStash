@@ -26,9 +26,20 @@ markers, configuration, Keychain types, and the biometrics/Secure Enclave surfac
 - ``SwiftStash``
 - ``SwiftStash/logLevel``
 - ``SwiftStash/configureLogging(level:)``
+- ``SwiftStash/configureUserDefaults(_:)``
 - ``SwiftStash/configureUserDefaults(suiteName:)``
+- ``SwiftStash/configureUserDefaults(_:for:)``
+- ``SwiftStash/userDefaults``
+- ``SwiftStash/userDefaults(for:)``
+- ``SwiftStash/resetUserDefaults()``
+- ``SwiftStash/resetUserDefaults(for:)``
 - ``SwiftStash/configureKeychain(service:accessibility:isSynchronizable:itemClass:)``
 - ``StashLogLevel``
+
+### Store Scopes
+
+- ``StashScope``
+- ``StashScopedKey``
 
 ### Keychain
 

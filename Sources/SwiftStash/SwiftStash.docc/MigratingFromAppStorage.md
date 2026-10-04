@@ -42,6 +42,7 @@ Add the package (see <doc:GettingStarted>), then add only the configuration your
 ```swift
 // Only if the app shares settings with extensions via an App Group:
 SwiftStash.configureUserDefaults(suiteName: "group.com.example.app")
+// (or pass an instance the app already holds: SwiftStash.configureUserDefaults(groupDefaults))
 
 // Only if any @SecureStash will be used — required before the first wrapper is created:
 SwiftStash.configureKeychain(
@@ -78,6 +79,7 @@ Every SwiftStash initialiser accepts these typed keys directly:
 | Existing code | Replacement |
 |---------------|-------------|
 | `@AppStorage("k") var x: T = d` in a `View` | `@Stashed("k") var x: T = d` — rename the attribute (import `SwiftStashUI`) |
+| `.defaultAppStorage(store)` | add `.stashStore(store)` next to it — keep both while any `@AppStorage` remains |
 | `@AppStorage` in a non-`View` type | `@Stash("k") var x: T = d` — remove the SwiftUI import if now unused |
 | `UserDefaults` get/set pairs | one `@Stash` property |
 | JSON blob | `@Stash(codable: "k") var x = d` — pass `encoder:`/`decoder:` if the format used custom strategies |
