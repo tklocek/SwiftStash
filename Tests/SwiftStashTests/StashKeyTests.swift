@@ -222,7 +222,7 @@ struct StashKeyTests {
     }
 
     @Test
-    func `Stashed accepts every key variant`() async {
+    func `Stashed accepts every key variant`() {
         let (userDefaults, cleanup) = makeUserDefaults(suiteName: "stashKey.stashed.\(UUID().uuidString)")
         defer { cleanup() }
 
@@ -243,9 +243,7 @@ struct StashKeyTests {
 
         #expect(userDefaults.integer(forKey: "keyPriority") == Priority.low.rawValue)
         #expect(userDefaults.object(forKey: "keyOptionalPriorityWithDefault") == nil)
-        // Assigning nil removes the key; the observer re-reads the key's default once the
-        // debounced change notification arrives.
-        try? await Task.sleep(nanoseconds: 100_000_000)
+        // Assigning nil removes the key and reads the key's default back immediately.
         #expect(optionalRaw.wrappedValue == .high)
     }
 
