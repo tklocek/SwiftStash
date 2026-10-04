@@ -38,7 +38,7 @@ struct SettingsView: View {                                   // and in SwiftUI:
 }
 ```
 
-> **Status: 0.1.0** — the API is functional and covered by automated tests, but may still change before 1.0. Feedback and issues are very welcome.
+> **Status: 0.2.0** — the API is functional and covered by automated tests, but may still change before 1.0. Feedback and issues are very welcome.
 
 ## Why SwiftStash instead of `@AppStorage`?
 
@@ -53,6 +53,8 @@ struct SettingsView: View {                                   // and in SwiftUI:
 | React to changes from *anywhere* | ❌ Only re-renders its own view | ✅ Per-key `AsyncStream` |
 | Catch unstorable types early | ❌ Runtime exception | ✅ Compile error |
 | Tell "never set" from "default" | ❌ Impossible | ✅ `$property.exists` |
+| Declare a default once for model and view | ❌ Repeated at every declaration | ✅ `StashKey` |
+| Persist a property of an `@Observable` model | ❌ Rejected by the macro | ✅ `StashObservable` |
 
 **And there is no persisted-data migration for compatible values.** `@Stash` and `@Stashed` use the same storage representation as `@AppStorage`, so existing primitive and raw-representable values are picked up as-is — convert one property at a time. If you never hit any wall above, keep using `@AppStorage`.
 
@@ -76,7 +78,7 @@ Add SwiftStash to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/tklocek/SwiftStash.git", from: "0.1.0")
+    .package(url: "https://github.com/tklocek/SwiftStash.git", from: "0.2.0")
 ]
 ```
 
@@ -144,8 +146,8 @@ The full DocC documentation is published at **[tklocek.github.io/SwiftStash/docu
 |---|---|
 | [Getting Started](https://tklocek.github.io/SwiftStash/documentation/swiftstash/gettingstarted) | Installation, configuration, first wrappers |
 | [Migrating from @AppStorage](https://tklocek.github.io/SwiftStash/documentation/swiftstash/migratingfromappstorage) | Incremental adoption with zero data migration |
-| [UserDefaults Storage](https://tklocek.github.io/SwiftStash/documentation/swiftstash/userdefaultsstorage) | `@Stash` initialisers, typed keys, projected values, observation |
-| [SwiftUI Storage](https://tklocek.github.io/SwiftStash/documentation/swiftstash/swiftuistorage) | `@Stashed` and bindings |
+| [UserDefaults Storage](https://tklocek.github.io/SwiftStash/documentation/swiftstash/userdefaultsstorage) | `@Stash` initialisers, typed keys, `StashKey`, choosing and injecting the store, observable models, projected values, observation |
+| [SwiftUI Storage](https://tklocek.github.io/SwiftStash/documentation/swiftstash/swiftuistorage) | `@Stashed`, bindings, and the `.stashStore` environment |
 | [Keychain Storage](https://tklocek.github.io/SwiftStash/documentation/swiftstash/keychainstorage) | `@SecureStash`, accessibility, iCloud sync, item classes |
 | [Biometrics & Secure Enclave](https://tklocek.github.io/SwiftStash/documentation/swiftstash/keychaincrypto) | Face ID / Touch ID items, hardware-backed keys via `KeychainManager` |
 | [Logging](https://tklocek.github.io/SwiftStash/documentation/swiftstash/logging) | Privacy-preserving OSLog integration and log levels |

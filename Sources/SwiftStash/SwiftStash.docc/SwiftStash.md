@@ -40,6 +40,9 @@ requires no data migration and can be done one property at a time. See
 - **@Stash** - UserDefaults storage for preferences and app state
 - **@SecureStash** - Keychain storage for sensitive data like tokens and passwords
 - **Per-Key Observation** - `AsyncStream` updates for any key, from any writer
+- **Keys With Defaults** - ``StashKey`` states a key's default once for every wrapper that reads it
+- **Injectable Stores** - ``StashContainer``, ``StashScope``, and the `.stashStore` environment keep tests and packages on their own suites
+- **Observable Models** - ``StashObservable`` persists properties of `@Observable` classes
 - **Unified Logging** - Configurable logging levels for both storage backends
 - **Type-Safe** - Full support for primitives, enums, Codable types, and optionals
 - **Thread-Safe Core Wrappers** - `Stash` and `SecureStash` are `Sendable` and safe as `static let` under Swift 6 strict concurrency
