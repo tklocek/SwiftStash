@@ -28,6 +28,13 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
   read once, when the wrapper is created; configuring after a wrapper has resolved its store
   is now logged as an error.
 
+### Fixed
+
+- `@Stashed` now reads back the stored value right after a write instead of showing the
+  assigned one until its debounced change notification arrives. Assigning `nil` to an optional
+  with a non-nil default reads the default immediately (as `@Stash` does), a failed `Codable`
+  encode keeps showing the previously stored value, and a view renders once per write.
+
 ## [0.1.0]
 
 Initial public release of SwiftStash: type-safe persistence for UserDefaults,
