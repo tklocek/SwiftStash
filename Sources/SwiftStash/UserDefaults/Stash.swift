@@ -61,6 +61,8 @@ public struct Stash<Value: Sendable>: Sendable {
     /// Rebinds the storage to a ``StashContainer``'s store; `nil` when the declaration passed
     /// an explicit store, which a container never overrides.
     private let containerStorage: StashContainerStorage<Value>?
+    /// Reports reads and writes to the enclosing instance when it is a ``StashObservable``.
+    private let observationBridge = StashObservationBridge<Value>()
     
     public var wrappedValue: Value {
         get { storage.get() }
@@ -109,15 +111,33 @@ public struct Stash<Value: Sendable>: Sendable {
     /// Reads and writes the property through its enclosing class instance.
     ///
     /// The compiler calls this for `@Stash` instance properties of classes, so a property of a
-    /// ``StashContainer`` uses the container's store. In any other class it uses the store the
-    /// wrapper resolved at initialisation, exactly as ``wrappedValue`` does.
+    /// ``StashContainer`` uses the container's store, and a property of a ``StashObservable``
+    /// takes part in observation. In any other class it uses the store the wrapper resolved at
+    /// initialisation, exactly as ``wrappedValue`` does.
     public static subscript<EnclosingSelf: AnyObject>(
         _enclosingInstance object: EnclosingSelf,
         wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Value>,
         storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Stash<Value>>
     ) -> Value {
-        get { object[keyPath: storageKeyPath].storage(in: object).get() }
-        set { object[keyPath: storageKeyPath].storage(in: object).set(newValue) }
+        get {
+            let wrapper = object[keyPath: storageKeyPath]
+            let storage = wrapper.storage(in: object)
+            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *),
+               let observable = object as? any StashObservable {
+                return wrapper.observationBridge.read(storage, of: observable, at: wrappedKeyPath)
+            }
+            return storage.get()
+        }
+        set {
+            let wrapper = object[keyPath: storageKeyPath]
+            let storage = wrapper.storage(in: object)
+            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *),
+               let observable = object as? any StashObservable {
+                wrapper.observationBridge.write(newValue, to: storage, of: observable, at: wrappedKeyPath)
+                return
+            }
+            storage.set(newValue)
+        }
     }
 
     /// The projected value of a `@Stash` instance property of a class, on the same store the

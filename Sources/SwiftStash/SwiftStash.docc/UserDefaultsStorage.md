@@ -179,6 +179,28 @@ conform, keeps the store it resolved at initialisation.
 > Important: The conformance is what routes the properties. Without `: StashContainer`, the
 > `stashStore` property is just a property, and the wrappers use the configured store.
 
+### Observable Models
+
+The `@Observable` macro rejects property wrappers on the properties it tracks. Conform an
+`@Observable` class to ``StashObservable`` and mark each stash `@ObservationIgnored`; the
+wrapper then reports reads and writes to the class's observation registrar itself, so SwiftUI
+views observing the model update as for any other property (iOS 17, macOS 14 and later):
+
+```swift
+@MainActor @Observable
+final class TimerViewModel: StashObservable {
+    @ObservationIgnored @Stash(.timerMinutes) var minutes: Int
+    var isRunning = false
+}
+```
+
+There is no observable mirror to keep in sync and no restore step at launch: the value is read
+from the store on every access. Writes that bypass the model — a `@Stashed` in a settings
+view, another wrapper on the same key, another process — reach its observers as well, on the
+thread that wrote. The macro supplies the protocol's requirements, but generates them
+`internal`, so a `public` class cannot conform. Add ``StashContainer`` to hold the store in the
+model too.
+
 ### A Store per Package
 
 A package that uses SwiftStash internally keeps its preferences in a ``StashScope`` of its own,
