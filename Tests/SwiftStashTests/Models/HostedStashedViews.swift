@@ -77,6 +77,14 @@ final class HostedView<Content: View> {
         render()
     }
 
+    /// Renders until `condition` holds or `timeout` seconds pass, and returns whether it held.
+    func settle(until condition: @MainActor () -> Bool, timeout: Double = 2) async -> Bool {
+        await waitUntil(timeout: timeout) {
+            render()
+            return condition()
+        }
+    }
+
     /// Lets pending invalidations (bindings, debounced notifications) reach the view.
     func render() {
         RunLoop.main.run(mode: .default, before: Date().addingTimeInterval(0.05))

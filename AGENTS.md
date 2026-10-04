@@ -324,7 +324,7 @@ cd Example && xcodebuild -project SwiftStashExample.xcodeproj \
 - `SwiftStash` module must not import SwiftUI (its whole reason to exist). UI-facing code goes in `SwiftStashUI`.
 - The core wrappers `Stash` and `SecureStash` are `Sendable` with `nonmutating set` — keep them usable as `static let`. `Stashed` is a `@MainActor` SwiftUI `DynamicProperty`, not the shared-state wrapper.
 - Public API is documented with DocC; update the catalogue when adding public symbols. The package catalogue (articles + core symbols) is `Sources/SwiftStash/SwiftStash.docc/`; `Sources/SwiftStashUI/SwiftStashUI.docc/` holds only that module's landing page (its abstract is the module's tile on the merged documentation site built by `Scripts/build-docs.sh`).
-- Logging: keys are `.private`, type names `.public` — never log stored values.
+- Logging: keys are `.private`, type names `.public` — never log stored values. Operations and coding go to the unified log's `.debug` level, errors to `.error` (`Logging.osLogType(for:)`); never emit per-access messages at a level the system stores (`.default`/`.notice`), or every read and write lands on disk.
 
 ### Branding
 

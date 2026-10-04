@@ -52,6 +52,15 @@ struct LoggingTests {
         #expect(level.shouldLog(messageLevel: .verbose) == true)
     }
 
+    // MARK: - Unified Log Levels
+
+    @Test
+    func `Operations and coding go to the unstored debug level, errors to error`() {
+        #expect(Logging.osLogType(for: .operation) == .debug)
+        #expect(Logging.osLogType(for: .coding) == .debug)
+        #expect(Logging.osLogType(for: .error) == .error)
+    }
+
     // MARK: - Configuration
 
     @Test

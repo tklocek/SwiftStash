@@ -143,9 +143,8 @@ struct StashedEnvironmentTests {
         #expect(probe.renderedValue == 0)
 
         suite.set(7, forKey: key)
-        await host.settle()
 
-        #expect(probe.renderedValue == 7)
+        #expect(await host.settle { probe.renderedValue == 7 })
     }
 
     @Test

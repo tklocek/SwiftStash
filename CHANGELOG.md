@@ -40,6 +40,9 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- Operation logs (`.normal` and above) are written at the unified log's `.debug` level
+  instead of `.default`, which the system stores on disk: reads and writes no longer fill the
+  persisted log and appear only while somebody streams it. Errors stay at `.error`.
 - `@Stashed` now reads back the stored value right after a write instead of showing the
   assigned one until its debounced change notification arrives. Assigning `nil` to an optional
   with a non-nil default reads the default immediately (as `@Stash` does), a failed `Codable`

@@ -217,8 +217,7 @@ struct StashKeyTests {
 
         model.wrappedValue = 9
         // The view's shared observer learns of the model's write through KVO, debounced.
-        try? await Task.sleep(nanoseconds: 100_000_000)
-        #expect(view.wrappedValue == 9)
+        #expect(await waitUntil { view.wrappedValue == 9 })
     }
 
     @Test

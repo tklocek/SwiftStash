@@ -49,6 +49,21 @@ func makeUserDefaults(
     return (userDefaults, cleanup)
 }
 
+// MARK: - Asynchronous Delivery
+
+/// Polls `condition` every 10 ms until it holds or `timeout` seconds pass, and returns whether
+/// it held. KVO deliveries hop onto the main actor and are debounced; under parallel test load
+/// they take longer than any fixed delay a test could afford.
+@MainActor
+func waitUntil(timeout: Double = 2, _ condition: @MainActor () -> Bool) async -> Bool {
+    let deadline = Date().addingTimeInterval(timeout)
+    while !condition() {
+        guard Date() < deadline else { return false }
+        try? await Task.sleep(nanoseconds: 10_000_000)
+    }
+    return true
+}
+
 // MARK: - Keychain Mock Backend
 
 /// Serialises access to process-wide test state: the `KeychainRuntime.shared`

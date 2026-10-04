@@ -6,7 +6,6 @@
 // SPDX-License-Identifier: MIT
 //
 
-import OSLog
 
 /// Defines the logging verbosity levels for SwiftStash operations.
 ///
@@ -17,26 +16,14 @@ import OSLog
 ///
 /// This enum can be shared across different logging implementations and wrappers.
 public enum StashLogLevel: Int, Sendable, CaseIterable, Hashable, Codable {
-    /// Minimal logging - only critical errors
+    /// Minimal logging - only critical errors (default)
     case minimal = 0
     
-    /// Normal logging - errors and important operations (default)
+    /// Normal logging - errors and important operations
     case normal = 1
     
     /// Verbose logging - all operations with detailed information
     case verbose = 2
-    
-    /// Converts StashLogLevel to OSLogType for use with os.Logger
-    var osLogType: OSLogType {
-        switch self {
-        case .minimal:
-            return .error
-        case .normal:
-            return .default
-        case .verbose:
-            return .debug
-        }
-    }
     
     /// Determines if a message at the given level should be logged
     /// - Parameter messageLevel: The level of the message being considered
