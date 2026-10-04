@@ -54,7 +54,6 @@ public final class KeychainManager: KeychainManagerProtocol {
     private let isSynchronizable: Bool
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
-    // Internal so the Crypto extensions (separate files, same module) can build queries.
     let service: String
     
     /// Creates a new instance of `KeychainManager` with configurable defaults for all keychain operations.

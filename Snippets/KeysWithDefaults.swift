@@ -11,8 +11,6 @@ enum Theme: String {
     case system, light, dark
 }
 
-// Each key sits in an extension of its value type, so `.launchCount`
-// is a StashKey<Int> without saying so.
 extension StashKey<Int> {
     static var launchCount: Self { .init("launchCount", default: 0) }
 }

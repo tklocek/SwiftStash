@@ -24,7 +24,7 @@ public extension Stash {
         defaultValue: Value,
         userDefaults: UserDefaults? = nil
     ) where Value: UserDefaultsPrimitiveType {
-        self.init(key: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
+        self.init(key: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults, scope: StashScope.of(key))
     }
 
     /// Creates a property wrapper for storing primitive values in UserDefaults
@@ -40,7 +40,7 @@ public extension Stash {
         _ key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) where Value: UserDefaultsPrimitiveType {
-        self.init(key: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
+        self.init(key: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults, scope: StashScope.of(key))
     }
 }
 
@@ -58,7 +58,7 @@ public extension Stash where Value: ExpressibleByNilLiteral & UserDefaultsPrimit
         key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
+        self.init(key: key.rawValue, defaultValue: nil, userDefaults: userDefaults, scope: StashScope.of(key))
     }
 
     /// Creates a property wrapper for storing optional primitive values in UserDefaults
@@ -72,7 +72,7 @@ public extension Stash where Value: ExpressibleByNilLiteral & UserDefaultsPrimit
         _ key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
+        self.init(key: key.rawValue, defaultValue: nil, userDefaults: userDefaults, scope: StashScope.of(key))
     }
 }
 
@@ -99,7 +99,7 @@ public extension Stash where Value: Codable {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        self.init(codable: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults ?? Self.scopedStore(for: key), encoder: encoder, decoder: decoder)
+        self.init(codable: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults, scope: StashScope.of(key), encoder: encoder, decoder: decoder)
     }
 
     /// Creates a property wrapper for storing Codable types in UserDefaults using JSON encoding
@@ -122,7 +122,7 @@ public extension Stash where Value: Codable {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        self.init(codable: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults ?? Self.scopedStore(for: key), encoder: encoder, decoder: decoder)
+        self.init(codable: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults, scope: StashScope.of(key), encoder: encoder, decoder: decoder)
     }
 }
 
@@ -147,7 +147,7 @@ public extension Stash where Value: Codable & ExpressibleByNilLiteral {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        self.init(codable: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key), encoder: encoder, decoder: decoder)
+        self.init(codable: key.rawValue, defaultValue: nil, userDefaults: userDefaults, scope: StashScope.of(key), encoder: encoder, decoder: decoder)
     }
 }
 
@@ -167,7 +167,7 @@ public extension Stash where Value: RawRepresentable, Value.RawValue: PropertyLi
         defaultValue: Value,
         userDefaults: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
+        self.init(key: key.rawValue, defaultValue: defaultValue, userDefaults: userDefaults, scope: StashScope.of(key))
     }
 
     /// Creates a property wrapper for storing RawRepresentable types (like enums) in UserDefaults
@@ -183,7 +183,7 @@ public extension Stash where Value: RawRepresentable, Value.RawValue: PropertyLi
         _ key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
+        self.init(key: key.rawValue, defaultValue: wrappedValue, userDefaults: userDefaults, scope: StashScope.of(key))
     }
 }
 
@@ -201,7 +201,7 @@ public extension Stash {
         key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
-        self.init(key: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
+        self.init(key: key.rawValue, defaultValue: nil, userDefaults: userDefaults, scope: StashScope.of(key))
     }
 
     /// Creates a property wrapper for storing optional RawRepresentable types in UserDefaults
@@ -215,16 +215,6 @@ public extension Stash {
         _ key: some RawRepresentable<String>,
         userDefaults: UserDefaults? = nil
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
-        self.init(key: key.rawValue, userDefaults: userDefaults ?? Self.scopedStore(for: key))
-    }
-}
-
-// MARK: - Scope
-
-private extension Stash {
-    /// The configured store for a key whose type declares a ``StashScope``; `nil` leaves
-    /// the wrapper on the application-level store.
-    static func scopedStore(for key: some RawRepresentable<String>) -> UserDefaults? {
-        StashScope.of(key).map { StashConfiguration.shared.resolveUserDefaults(for: $0) }
+        self.init(key: key.rawValue, defaultValue: nil, userDefaults: userDefaults, scope: StashScope.of(key))
     }
 }

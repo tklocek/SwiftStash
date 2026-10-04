@@ -105,9 +105,21 @@ Parameter-label asymmetry is intentional — don't "fix" it: `Stash` calls the s
 One resolution chain for `@Stash`, `@Stashed`, and `SwiftStash.updates(forKey:in:)`:
 
 1. explicit `userDefaults:` / `store:` / `in:` — the only per-declaration override;
-2. SwiftUI environment (`@Stashed` only, when hosted): `.stashStore(_:for: scope)`, then `.stashStore(_:)` — the unscoped modifier covers scoped wrappers too; the modifier nearest the view wins;
+2. the instance's store — `@Stash` in a class conforming to `StashContainer` uses its `stashStore` (looked up on each access); for `@Stashed` (when hosted) the SwiftUI environment: `.stashStore(_:for: scope)`, then `.stashStore(_:)` — the unscoped modifier covers scoped wrappers too; the modifier nearest the view wins;
 3. the store configured for the key's `StashScope` — `SwiftStash.configureUserDefaults(_:for:)`;
 4. the application-level store — `SwiftStash.configureUserDefaults(_:)` / `(suiteName:)`, else `.standard`.
+
+Container (dependency injection for tests, the store stated once):
+
+```swift
+@MainActor final class AppSettings: StashContainer {
+    let stashStore: StashStore
+    @Stash(.launchCount) var launchCount: Int      // reads/writes stashStore, and so does $launchCount
+    init(defaults: UserDefaults = .standard) { stashStore = StashStore(defaults) }
+}
+```
+
+Implemented with the `_enclosingInstance` static subscripts on `Stash` (the mechanism `@Published` uses): classes only; non-conforming classes, structs, actors and `static let` behave as before.
 
 Rungs 3–4 are read **once, at wrapper init** (deliberate: no lock per access, simple observer cache). `SwiftStash.userDefaults` / `.userDefaults(for:)` read the configuration; `resetUserDefaults()` / `resetUserDefaults(for:)` reset it.
 
@@ -202,6 +214,7 @@ try keychain.deleteKey(CryptoKeyDescriptor(stringTag: "com.example.signing"))  /
 | Auth tokens, API keys, passwords, encryption keys | `@SecureStash` |
 | Shared settings across app + extensions | `SwiftStash.configureUserDefaults(suiteName: "group…")` |
 | A package's own preferences, movable by the host app | `StashScope` + key type conforming to `StashScopedKey`; app calls `configureUserDefaults(_:for:)` |
+| Inject a test suite into a settings class without passing it to every property | `StashContainer` + `let stashStore: StashStore` |
 | Keep a SwiftUI test/preview off the real preferences | `.stashStore(testDefaults)` (next to `.defaultAppStorage(testDefaults)`) |
 | iCloud-synced credentials | `@SecureStash(key:…, isSynchronizable: true)` + syncable accessibility (not `*ThisDeviceOnly`) |
 | React to a setting changing anywhere in the app | `SwiftStash.updates(forKey:)` or `$prop.updates` |
@@ -230,6 +243,7 @@ try keychain.deleteKey(CryptoKeyDescriptor(stringTag: "com.example.signing"))  /
 14. **Data-based keychain writes support password classes only** — `.certificate`, `.key`, and `.identity` cannot be created via `kSecValueData` (SecItem expects `kSecValueRef` for them), so `@SecureStash`/`KeychainManager` writes with those classes fail at the SecItem layer. The cases exist for reading/deleting items created elsewhere.
 15. **UserDefaults stores are resolved at wrapper init** — configure (`configureUserDefaults…`) before the first wrapper is created; wrappers that already exist keep their store, and a late configure call is logged as an error. `static let` wrappers resolve on first touch. `.stashStore(_:)` reaches hosted `@Stashed` only — a view model's `@Stash` needs its store injected via `userDefaults:`.
 16. **A package configures only its own `StashScope`** — `SwiftStash.configureUserDefaults(_:)` (application level) belongs to the app; a package calling it would move the app's preferences too.
+17. **`StashContainer` routes only through the conformance, and only in classes** — a class with a `stashStore` property but without `: StashContainer`, or a struct, silently keeps the configured store. Don't add a `wrappedValue`-based shortcut that bypasses the `_enclosingInstance` subscripts; they are what makes `$prop` follow the container too.
 
 ## Adoption playbook (migrating an existing app to SwiftStash)
 

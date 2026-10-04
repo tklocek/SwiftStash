@@ -22,7 +22,7 @@ final class SettingsViewModel: ObservableObject {
     @Published var theme: Theme
     @Published var authToken: String
 
-    // Persistence — wrappers are cheap value types; hold them for the object's lifetime.
+    // Persistence
     @Stash(SharedKey.username) private var storedUsername = ""
     @Stash(SharedKey.theme) private var storedTheme: Theme = .system
     @SecureStash(key: SharedKey.authToken) private var storedAuthToken: String?

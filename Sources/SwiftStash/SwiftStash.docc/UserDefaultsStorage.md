@@ -114,7 +114,9 @@ Every wrapper resolves its store once, when it is created, in this order:
    ``StashScopedKey``;
 3. the application-level store, else `UserDefaults.standard`.
 
-`@Stashed` adds the SwiftUI environment between steps 1 and 2 — see <doc:SwiftUIStorage>.
+A `@Stash` property of a ``StashContainer`` class uses the container's store between steps 1
+and 2 — see <doc:UserDefaultsStorage#A-Store-per-Instance>. `@Stashed`
+adds the SwiftUI environment at the same place — see <doc:SwiftUIStorage>.
 `SwiftStash.updates(forKey:in:bufferingPolicy:)` follows the same order, with `in:` as the
 explicit store.
 
@@ -142,6 +144,40 @@ SwiftStash.configureUserDefaults(sharedDefaults)
 
 ``SwiftStash/userDefaults`` returns the configured store, for APIs that take a `UserDefaults`,
 and ``SwiftStash/resetUserDefaults()`` returns to `.standard`.
+
+### A Store per Instance
+
+A settings type that tests construct with their own suite would otherwise pass the store to
+every property. Conform the class to ``StashContainer`` instead: it holds the store once, and
+every `@Stash` property declared in it — and its projected value — reads and writes that store:
+
+```swift
+@MainActor
+final class AppSettings: StashContainer {
+    let stashStore: StashStore
+
+    @Stash(.launchCount) var launchCount: Int
+    @Stash(.theme) var theme: Theme
+
+    init(defaults: UserDefaults = .standard) {
+        stashStore = StashStore(defaults)
+    }
+}
+
+let settings = AppSettings(defaults: testDefaults)    // every property on the test's suite
+```
+
+``StashStore`` wraps the `UserDefaults` so that a main-actor class can satisfy the requirement
+with a plain `let`. The container's store wins over scopes and the application level; a
+property declared with an explicit `userDefaults:` keeps that store. The store is looked up on
+each access, so replacing ``StashContainer/stashStore`` moves every property.
+
+Only classes can be containers — the wrapper reaches the store through its enclosing instance,
+which Swift provides for class properties. A `@Stash` in a struct, or in a class that does not
+conform, keeps the store it resolved at initialisation.
+
+> Important: The conformance is what routes the properties. Without `: StashContainer`, the
+> `stashStore` property is just a property, and the wrappers use the configured store.
 
 ### A Store per Package
 

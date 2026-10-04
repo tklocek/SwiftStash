@@ -56,7 +56,11 @@ import Foundation
 /// ```
 @propertyWrapper
 public struct Stash<Value: Sendable>: Sendable {
+    /// The storage on the store resolved at initialisation.
     private let storage: AnyUserDefaultsStorage<Value>
+    /// Rebinds the storage to a ``StashContainer``'s store; `nil` when the declaration passed
+    /// an explicit store, which a container never overrides.
+    private let containerStorage: StashContainerStorage<Value>?
     
     public var wrappedValue: Value {
         get { storage.get() }
@@ -76,8 +80,54 @@ public struct Stash<Value: Sendable>: Sendable {
         StashHandle(storage: storage)
     }
 
-    init(storage: AnyUserDefaultsStorage<Value>) {
-        self.storage = storage
+    /// Resolves the store and builds the storage for every initialiser.
+    /// - Parameters:
+    ///   - explicitStore: The store passed at the declaration, if any.
+    ///   - scope: The key's scope, if its type declares one.
+    ///   - makeStorage: Builds the storage on a given store.
+    private init(
+        explicitStore: UserDefaults?,
+        scope: StashScope?,
+        makeStorage: @escaping @Sendable (UserDefaults) -> AnyUserDefaultsStorage<Value>
+    ) {
+        let store = explicitStore ?? StashConfiguration.shared.resolveUserDefaults(for: scope)
+        self.storage = makeStorage(store)
+        self.containerStorage = explicitStore == nil ? StashContainerStorage(makeStorage) : nil
+    }
+
+    /// The storage on the container's store when `object` is a ``StashContainer`` and the
+    /// declaration passed no explicit store; otherwise the storage resolved at initialisation.
+    private func storage(in object: AnyObject) -> AnyUserDefaultsStorage<Value> {
+        guard let containerStorage, let container = object as? any StashContainer else {
+            return storage
+        }
+        return containerStorage.storage(on: container.stashStore.userDefaults)
+    }
+
+    // MARK: - Enclosing instance
+
+    /// Reads and writes the property through its enclosing class instance.
+    ///
+    /// The compiler calls this for `@Stash` instance properties of classes, so a property of a
+    /// ``StashContainer`` uses the container's store. In any other class it uses the store the
+    /// wrapper resolved at initialisation, exactly as ``wrappedValue`` does.
+    public static subscript<EnclosingSelf: AnyObject>(
+        _enclosingInstance object: EnclosingSelf,
+        wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Value>,
+        storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Stash<Value>>
+    ) -> Value {
+        get { object[keyPath: storageKeyPath].storage(in: object).get() }
+        set { object[keyPath: storageKeyPath].storage(in: object).set(newValue) }
+    }
+
+    /// The projected value of a `@Stash` instance property of a class, on the same store the
+    /// property reads and writes (see ``subscript(_enclosingInstance:wrapped:storage:)``).
+    public static subscript<EnclosingSelf: AnyObject>(
+        _enclosingInstance object: EnclosingSelf,
+        projected projectedKeyPath: KeyPath<EnclosingSelf, StashHandle<Value>>,
+        storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Stash<Value>>
+    ) -> StashHandle<Value> {
+        StashHandle(storage: object[keyPath: storageKeyPath].storage(in: object))
     }
 
 
@@ -93,14 +143,20 @@ public struct Stash<Value: Sendable>: Sendable {
         defaultValue: Value,
         userDefaults: UserDefaults? = nil
     ) where Value: UserDefaultsPrimitiveType {
-        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.resolveUserDefaults(for: nil)
-        self.storage = AnyUserDefaultsStorage(
-            PrimitiveUserDefaultsStorage(
-                key: key,
-                defaultValue: defaultValue,
-                userDefaults: resolvedDefaults
+        self.init(key: key, defaultValue: defaultValue, userDefaults: userDefaults, scope: nil)
+    }
+
+    init(
+        key: String,
+        defaultValue: Value,
+        userDefaults: UserDefaults?,
+        scope: StashScope?
+    ) where Value: UserDefaultsPrimitiveType {
+        self.init(explicitStore: userDefaults, scope: scope) { store in
+            AnyUserDefaultsStorage(
+                PrimitiveUserDefaultsStorage(key: key, defaultValue: defaultValue, userDefaults: store)
             )
-        )
+        }
     }
 
     /// Creates a property wrapper for storing primitive values in UserDefaults
@@ -165,15 +221,13 @@ public extension Stash where Value: Codable {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.resolveUserDefaults(for: nil)
-        self.storage = AnyUserDefaultsStorage(
-            CodableUserDefaultsStorage(
-                key: key,
-                defaultValue: defaultValue,
-                userDefaults: resolvedDefaults,
-                encoder: encoder ?? JSONEncoder(),
-                decoder: decoder ?? JSONDecoder()
-            )
+        self.init(
+            codable: key,
+            defaultValue: defaultValue,
+            userDefaults: userDefaults,
+            scope: nil,
+            encoder: encoder,
+            decoder: decoder
         )
     }
 
@@ -196,6 +250,31 @@ public extension Stash where Value: Codable {
         decoder: JSONDecoder? = nil
     ) {
         self.init(codable: key, defaultValue: wrappedValue, userDefaults: userDefaults, encoder: encoder, decoder: decoder)
+    }
+}
+
+extension Stash where Value: Codable {
+    init(
+        codable key: String,
+        defaultValue: Value,
+        userDefaults: UserDefaults?,
+        scope: StashScope?,
+        encoder: JSONEncoder?,
+        decoder: JSONDecoder?
+    ) {
+        let encoder = encoder ?? JSONEncoder()
+        let decoder = decoder ?? JSONDecoder()
+        self.init(explicitStore: userDefaults, scope: scope) { store in
+            AnyUserDefaultsStorage(
+                CodableUserDefaultsStorage(
+                    key: key,
+                    defaultValue: defaultValue,
+                    userDefaults: store,
+                    encoder: encoder,
+                    decoder: decoder
+                )
+            )
+        }
     }
 }
 
@@ -235,14 +314,7 @@ public extension Stash where Value: RawRepresentable, Value.RawValue: PropertyLi
         defaultValue: Value,
         userDefaults: UserDefaults? = nil
     ) {
-        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.resolveUserDefaults(for: nil)
-        self.storage = AnyUserDefaultsStorage(
-            RawRepresentableUserDefaultsStorage(
-                key: key,
-                defaultValue: defaultValue,
-                userDefaults: resolvedDefaults
-            )
-        )
+        self.init(key: key, defaultValue: defaultValue, userDefaults: userDefaults, scope: nil)
     }
 
     /// Creates a property wrapper for storing RawRepresentable types (like enums) in UserDefaults
@@ -260,6 +332,21 @@ public extension Stash where Value: RawRepresentable, Value.RawValue: PropertyLi
     }
 }
 
+extension Stash where Value: RawRepresentable, Value.RawValue: PropertyListNativeType {
+    init(
+        key: String,
+        defaultValue: Value,
+        userDefaults: UserDefaults?,
+        scope: StashScope?
+    ) {
+        self.init(explicitStore: userDefaults, scope: scope) { store in
+            AnyUserDefaultsStorage(
+                RawRepresentableUserDefaultsStorage(key: key, defaultValue: defaultValue, userDefaults: store)
+            )
+        }
+    }
+}
+
 // MARK: - Optional RawRepresentable
 
 public extension Stash {
@@ -271,13 +358,7 @@ public extension Stash {
         key: String,
         userDefaults: UserDefaults? = nil
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
-        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.resolveUserDefaults(for: nil)
-        self.storage = AnyUserDefaultsStorage(
-            OptionalRawRepresentableUserDefaultsStorage<Wrapped>(
-                key: key,
-                userDefaults: resolvedDefaults
-            )
-        )
+        self.init(key: key, defaultValue: nil, userDefaults: userDefaults, scope: nil)
     }
 
     /// Creates a property wrapper for storing optional RawRepresentable types in UserDefaults
@@ -290,5 +371,24 @@ public extension Stash {
         userDefaults: UserDefaults? = nil
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
         self.init(key: key, userDefaults: userDefaults)
+    }
+}
+
+extension Stash {
+    init<Wrapped>(
+        key: String,
+        defaultValue: Value,
+        userDefaults: UserDefaults?,
+        scope: StashScope?
+    ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
+        self.init(explicitStore: userDefaults, scope: scope) { store in
+            AnyUserDefaultsStorage(
+                OptionalRawRepresentableUserDefaultsStorage<Wrapped>(
+                    key: key,
+                    userDefaults: store,
+                    defaultValue: defaultValue
+                )
+            )
+        }
     }
 }

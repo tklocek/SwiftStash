@@ -109,6 +109,6 @@ package struct OptionalRawRepresentableUserDefaultsStorage<Wrapped: RawRepresent
 // `@unchecked` because `UserDefaults` is documented as thread-safe but not annotated
 // `Sendable` in the SDK. The other stored properties are an immutable `String` and the
 // default value: `Wrapped?` is the `Value` of a `Stash`/`Stashed`, which requires
-// `Value: Sendable` (and `Optional` is `Sendable` only when `Wrapped` is).
+// `Value: Sendable`.
 extension OptionalRawRepresentableUserDefaultsStorage: @unchecked Sendable {}
 

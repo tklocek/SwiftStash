@@ -65,7 +65,6 @@ struct StashTests {
                 @Stash("appStorageStyle.stash.optionalInt") var optionalValue: Int?
             }
 
-            // `let` works because @Stash setters are nonmutating.
             let sut = AppStorageStyleStorage()
 
             #expect(sut.value == 9)

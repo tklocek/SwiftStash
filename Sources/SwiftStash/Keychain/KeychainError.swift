@@ -71,8 +71,6 @@ public enum KeychainError: LocalizedError, Sendable, Equatable {
     /// EC P-256 keys.
     case secureEnclaveAlgorithmInvalid
 
-    // LocalizedError's hook: `localizedDescription` (via NSError bridging) is derived
-    // from this, so the messages surface even through an untyped `any Error`.
     public var errorDescription: String? {
         switch self {
             case .invalidData:

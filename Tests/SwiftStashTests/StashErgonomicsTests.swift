@@ -35,11 +35,9 @@ private enum StaticStashContainer {
     )
 }
 
-/// Compiles only if the `@Stash` attribute is usable on a `static var`. Swift 6
-/// rejects that spelling in a nonisolated type (the synthesized backing storage is
-/// nonisolated global mutable state, regardless of `Sendable`), so the container
-/// must be actor-isolated; nonisolated types use the `static let` wrapper-instance
-/// form above instead.
+/// Compiles only if the `@Stash` attribute is usable on a `static var` of an
+/// actor-isolated type, the spelling AGENTS.md documents; nonisolated types use the
+/// `static let` wrapper-instance form above.
 @MainActor
 private enum StaticWrapperContainer {
     static let suiteName = "swiftstash.tests.staticWrapperStash"

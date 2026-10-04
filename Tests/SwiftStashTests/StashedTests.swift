@@ -674,9 +674,6 @@ struct StashedTests {
     
     // MARK: - Persistence & Cross-Instance Updates
     
-    // Note: Memory management tests are not applicable for @Stashed since it's a SwiftUI View (struct).
-    // SwiftUI manages the lifecycle of Views and their DynamicProperty storage automatically.
-    
     @Test
     func `Changes in one instance are reflected in another instance`() {
         let (userDefaults, cleanup) = makeUserDefaults(suiteName: "stashed.cross.instance")
