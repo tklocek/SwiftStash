@@ -359,6 +359,7 @@ public extension Stashed {
 extension Stashed {
     init<Wrapped>(
         key: String,
+        defaultValue: Wrapped? = nil,
         store: UserDefaults?,
         scope: StashScope?
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
@@ -366,7 +367,8 @@ extension Stashed {
             AnyUserDefaultsStorage(
                 OptionalRawRepresentableUserDefaultsStorage<Wrapped>(
                     key: key,
-                    userDefaults: userDefaults
+                    userDefaults: userDefaults,
+                    defaultValue: defaultValue
                 )
             )
         }

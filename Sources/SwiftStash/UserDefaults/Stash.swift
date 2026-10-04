@@ -76,6 +76,10 @@ public struct Stash<Value: Sendable>: Sendable {
         StashHandle(storage: storage)
     }
 
+    init(storage: AnyUserDefaultsStorage<Value>) {
+        self.storage = storage
+    }
+
 
     // MARK: - Primitive
     

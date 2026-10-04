@@ -237,6 +237,36 @@ enum SettingsKey: String {
 A key type that also conforms to ``StashScopedKey`` routes its wrappers to its scope's store
 (see <doc:UserDefaultsStorage#A-Store-per-Package>).
 
+### Keys That Carry Their Default
+
+A preference read by a model and shown in a view states its default twice with plain keys,
+and nothing checks that the two agree. A ``StashKey`` carries the value type and the default,
+so every wrapper declared with it reads the same one. Declare each key in an extension of its
+value type, so Swift infers the type from the name:
+
+```swift
+extension StashKey<Int> {
+    static var launchCount: Self { .init("launchCount", default: 0) }
+}
+
+extension StashKey<Theme> {
+    static var theme: Self { .init(SettingsKey.theme, default: .system) }
+}
+
+extension StashKey<Date?> {
+    static var lastLogin: Self { .init("lastLogin") }     // optional: defaults to nil
+}
+
+@Stash(.launchCount) var launchCount: Int
+@Stash(.theme) var theme: Theme
+@Stash(codable: .profile) var profile: Profile           // the wrapper still picks the format
+```
+
+The declaration names the key and never writes a value; a default assigned at the declaration
+does not compile. The wrapper still chooses the storage format: the unlabelled initialiser for
+property-list primitives and raw-representable enums, `codable:` for other `Codable` values.
+A key built from a ``StashScopedKey`` type carries its scope.
+
 ## Key Naming Conventions
 
 ```swift

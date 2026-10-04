@@ -8,6 +8,11 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ### Added
 
+- `StashKey<Value>`: a key that carries its value type and default, declared once
+  (`extension StashKey<Int> { static var launchCount: Self { .init("launchCount", default: 0) } }`)
+  and accepted by every `@Stash` and `@Stashed` variant (`@Stash(.launchCount) var launchCount: Int`,
+  `codable:` for `Codable` values, optionals defaulting to `nil`) and by
+  `SwiftStash.updates(forKey:)`. A key built from a `StashScopedKey` type carries its scope.
 - `.stashStore(_:)` and `.stashStore(_:for:)` view modifiers in `SwiftStashUI`: a hosted
   `@Stashed` now takes its store from the SwiftUI environment, the counterpart of
   `.defaultAppStorage(_:)`, so tests and previews can keep a view hierarchy off the app's

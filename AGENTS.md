@@ -87,6 +87,17 @@ enum AppState {
 
 Typed keys: every initialiser also accepts any `RawRepresentable<String>` key (`@Stash(SettingsKey.username) var username = ""`; labelled: `@Stash(key: SettingsKey.username, defaultValue: "")`).
 
+Keys that carry their default: `StashKey<Value>` (`name`, `defaultValue`), declared as `static var` in an extension of its value type, so `.name` infers the type and a model's `@Stash` and a view's `@Stashed` cannot drift apart on the default:
+
+```swift
+extension StashKey<Int> { static var launchCount: Self { .init("launchCount", default: 0) } }
+extension StashKey<Date?> { static var lastLogin: Self { .init("lastLogin") } }   // defaults to nil
+@Stash(.launchCount) var launchCount: Int          // labelled `codable:` for Codable values, as usual
+@Stashed(.launchCount) private var launchCount: Int
+```
+
+Accepted by every `@Stash`/`@Stashed` variant (primitive, raw-representable, `Codable` via `codable:`, optionals) and by `SwiftStash.updates(forKey:)`. The wrapper still picks the format (unlabelled vs `codable:`); a key built from a `StashScopedKey` type carries its scope. No `wrappedValue:` form exists — a default at the declaration doesn't compile, by design.
+
 Parameter-label asymmetry is intentional — don't "fix" it: `Stash` calls the store `userDefaults:` (the Foundation-side name), while `@Stashed` uses `store:` (mirrors `@AppStorage`) and `SwiftStash.updates(forKey:in:)` uses `in:` (reads naturally at the call site).
 
 ### Which store a wrapper uses
@@ -195,6 +206,7 @@ try keychain.deleteKey(CryptoKeyDescriptor(stringTag: "com.example.signing"))  /
 | iCloud-synced credentials | `@SecureStash(key:…, isSynchronizable: true)` + syncable accessibility (not `*ThisDeviceOnly`) |
 | React to a setting changing anywhere in the app | `SwiftStash.updates(forKey:)` or `$prop.updates` |
 | Detect "never set" vs "set to default" | `$prop.exists` |
+| One preference read by a model and a view, default declared once | `StashKey<Value>` + `@Stash(.key)` / `@Stashed(.key)` |
 | Keychain access with explicit error handling | `KeychainManager` |
 | Secret readable only after Face ID / Touch ID | `KeychainManager.saveBiometric` / `.loadBiometric` |
 | Hardware-backed signing/encryption key | `KeychainManager.generateKey(…, storage: .secureEnclave(…))` |
@@ -207,7 +219,7 @@ try keychain.deleteKey(CryptoKeyDescriptor(stringTag: "com.example.signing"))  /
 3. **Keys containing dots (`.`) cannot be observed** — KVO interprets them as key paths. Storage works; `updates` streams don't fire. Use dot-free keys if observation is needed.
 4. **Enums are stored as raw values**, not JSON — reading the same key with `@AppStorage` works; switching a key between `codable:` and primitive initialisers is a data-format change.
 5. **No compat `typealias LogLevel = StashLogLevel`** — deliberate decision (module/type shadowing collision). Don't add one.
-6. **Bare dot-syntax keys (`Stash(key: .foo)`) are impossible** with the generic `some RawRepresentable<String>` parameters; consuming apps keep a thin concrete extension if they want that spelling (see `Stash+CustomKeys.swift` pattern).
+6. **Bare dot-syntax keys (`Stash(key: .foo)`) are impossible** with the generic `some RawRepresentable<String>` parameters. For dot syntax use `StashKey` (`@Stash(.foo) var foo: Int`), which also carries the default; otherwise consuming apps keep a thin concrete extension (see `Stash+CustomKeys.swift` pattern).
 7. **`isSynchronizable: true` + any `*ThisDeviceOnly` accessibility is invalid** — iCloud Keychain cannot sync device-only items. The wrapper asserts in debug builds and logs an error; in release, writes fail at the SecItem layer.
 8. **`URL` and optionals cannot live inside collections** — `[URL]`, `[String: URL]`, `[String?]` are compile errors (`PropertyListNativeType`); use `@Stash(codable:)`.
 9. **A failed `Codable` encode keeps the previously stored value** — `@Stash(codable:)` logs the error and leaves the last known-good data in place rather than deleting the key.
