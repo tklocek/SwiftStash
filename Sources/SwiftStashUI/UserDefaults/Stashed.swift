@@ -58,7 +58,7 @@ public struct Stashed<Value: Sendable>: DynamicProperty {
             resolution.observer.currentValue
         }
         nonmutating set {
-            resolution.observer.currentValue = newValue
+            resolution.observer.write(newValue)
         }
     }
     
@@ -66,7 +66,7 @@ public struct Stashed<Value: Sendable>: DynamicProperty {
     public var projectedValue: Binding<Value> {
         Binding(
             get: { self.resolution.observer.currentValue },
-            set: { self.resolution.observer.currentValue = $0 }
+            set: { self.resolution.observer.write($0) }
         )
     }
 
@@ -495,6 +495,12 @@ private enum StashedObserverCache {
 /// ObservableObject that wraps UserDefaults storage with reactive updates.
 /// Listens to notifications and publishes changes to SwiftUI views.
 ///
+/// `currentValue` always mirrors what a fresh read of the store returns: a write goes through
+/// ``write(_:)``, which reads the stored value back before publishing it. A write need not
+/// round-trip — assigning `nil` to an optional with a non-nil default removes the key and reads
+/// back the default; a failed `Codable` encode keeps the previously stored value — and the view
+/// must never render the assigned value in between.
+///
 /// Instances are shared per (store, key, value type) via `StashedObserverCache`; the
 /// `defaultValue` (and, for Codable storage, the encoder/decoder pair) captured in
 /// `storage` therefore comes from the first live `Stashed` for that combination —
@@ -504,7 +510,7 @@ fileprivate final class StashedObserver<Value: Sendable>: ObservableObject {
     private let storage: AnyUserDefaultsStorage<Value>
     private var cancellables = Set<AnyCancellable>()
 
-    @Published var currentValue: Value
+    @Published private(set) var currentValue: Value
 
     init(_ storage: AnyUserDefaultsStorage<Value>) {
         self.storage = storage
@@ -527,22 +533,22 @@ fileprivate final class StashedObserver<Value: Sendable>: ObservableObject {
                 }
             }
             .store(in: &cancellables)
-        
-        // Save changes to UserDefaults when currentValue changes
-        $currentValue
-            .dropFirst()
-            .sink { [weak self] newValue in
-                guard let self else { return }
-                let storedValue = self.storage.get()
-                if self.shouldUpdate(from: storedValue, to: newValue) {
-                    self.storage.set(newValue)
-                    StashNotificationCenter.shared.notify(key: self.storage.key, in: self.storage.store)
-                } else {
-                    let typeName = String(describing: Value.self)
-                    Logging.logOperation("SKIP SET (value unchanged)", key: self.storage.key, type: typeName)
-                }
-            }
-            .store(in: &cancellables)
+    }
+
+    /// Writes `newValue` to the store, then publishes the value the store now holds.
+    func write(_ newValue: Value) {
+        if shouldUpdate(from: storage.get(), to: newValue) {
+            storage.set(newValue)
+            StashNotificationCenter.shared.notify(key: storage.key, in: storage.store)
+        } else {
+            let typeName = String(describing: Value.self)
+            Logging.logOperation("SKIP SET (value unchanged)", key: storage.key, type: typeName)
+        }
+
+        let storedValue = storage.get()
+        if shouldUpdate(from: currentValue, to: storedValue) {
+            currentValue = storedValue
+        }
     }
     
     private func shouldUpdate(from oldValue: Value, to newValue: Value) -> Bool {
