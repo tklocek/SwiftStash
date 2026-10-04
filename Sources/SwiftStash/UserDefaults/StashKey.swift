@@ -14,8 +14,8 @@ import Foundation
 /// twice with plain keys, and nothing checks that the two agree. A `StashKey` states it once:
 /// every wrapper declared with the key reads the same default.
 ///
-/// Declare each key as a static member of an extension of its value type, so Swift infers the
-/// type from the name and the call site never writes a value:
+/// Declare each key as a static member of an extension of its value type; a call site then
+/// names only the key and never writes a value:
 ///
 /// ```swift
 /// extension StashKey<Int> {
@@ -29,8 +29,6 @@ import Foundation
 /// @Stash(.launchCount) var launchCount: Int                    // in a model
 /// @Stashed(.launchCount) private var launchCount: Int          // in a view, same default
 /// ```
-///
-/// Members of a generic type cannot be stored, hence `static var`.
 ///
 /// The storage format is chosen by the wrapper, as with plain keys: property-list primitives and
 /// raw-representable enums use the unlabelled initialiser, any other `Codable` value uses
@@ -107,7 +105,7 @@ public extension Stash {
     ///   - userDefaults: The UserDefaults instance to use. Defaults to the store configured for the
     ///     key's ``StashScope``, else the globally configured instance.
     init(_ key: StashKey<Value>, userDefaults: UserDefaults? = nil) where Value: UserDefaultsPrimitiveType {
-        self.init(key: key.name, defaultValue: key.defaultValue, userDefaults: key.store(explicit: userDefaults))
+        self.init(key: key.name, defaultValue: key.defaultValue, userDefaults: userDefaults, scope: key.scope)
     }
 
     /// Creates a property wrapper for a raw-representable value (like an enum), using the key's
@@ -118,7 +116,7 @@ public extension Stash {
     ///     key's ``StashScope``, else the globally configured instance.
     init(_ key: StashKey<Value>, userDefaults: UserDefaults? = nil)
     where Value: RawRepresentable, Value.RawValue: PropertyListNativeType {
-        self.init(key: key.name, defaultValue: key.defaultValue, userDefaults: key.store(explicit: userDefaults))
+        self.init(key: key.name, defaultValue: key.defaultValue, userDefaults: userDefaults, scope: key.scope)
     }
 
     /// Creates a property wrapper for an optional raw-representable value, using the key's name
@@ -129,16 +127,7 @@ public extension Stash {
     ///     key's ``StashScope``, else the globally configured instance.
     init<Wrapped>(_ key: StashKey<Value>, userDefaults: UserDefaults? = nil)
     where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
-        self.init(
-            storage: AnyUserDefaultsStorage(
-                OptionalRawRepresentableUserDefaultsStorage<Wrapped>(
-                    key: key.name,
-                    userDefaults: key.store(explicit: userDefaults)
-                        ?? StashConfiguration.shared.resolveUserDefaults(for: nil),
-                    defaultValue: key.defaultValue
-                )
-            )
-        )
+        self.init(key: key.name, defaultValue: key.defaultValue, userDefaults: userDefaults, scope: key.scope)
     }
 
     /// Creates a property wrapper for a `Codable` value stored as JSON, using the key's name and
@@ -165,7 +154,8 @@ public extension Stash {
         self.init(
             codable: key.name,
             defaultValue: key.defaultValue,
-            userDefaults: key.store(explicit: userDefaults),
+            userDefaults: userDefaults,
+            scope: key.scope,
             encoder: encoder,
             decoder: decoder
         )

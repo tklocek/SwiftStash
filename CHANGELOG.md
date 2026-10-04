@@ -8,6 +8,11 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ### Added
 
+- `StashContainer` and `StashStore`: a class states its UserDefaults store once
+  (`let stashStore: StashStore`), and every `@Stash` property declared in it — and its
+  projected value — reads and writes that store, so a test injects its suite without passing
+  it to each property. The container's store wins over scopes and the application level; an
+  explicit `userDefaults:` still wins over the container.
 - `StashKey<Value>`: a key that carries its value type and default, declared once
   (`extension StashKey<Int> { static var launchCount: Self { .init("launchCount", default: 0) } }`)
   and accepted by every `@Stash` and `@Stashed` variant (`@Stash(.launchCount) var launchCount: Int`,

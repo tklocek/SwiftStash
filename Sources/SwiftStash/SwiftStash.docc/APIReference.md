@@ -45,6 +45,11 @@ markers, configuration, Keychain types, and the biometrics/Secure Enclave surfac
 - ``StashScope``
 - ``StashScopedKey``
 
+### Containers
+
+- ``StashContainer``
+- ``StashStore``
+
 ### Keychain
 
 - ``KeychainManager``

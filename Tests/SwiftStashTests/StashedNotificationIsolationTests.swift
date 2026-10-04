@@ -37,10 +37,8 @@ struct StashedNotificationIsolationTests {
             .sink { keyBNotificationCount += 1 }
             .store(in: &cancellables)
 
-        // Only notify keyA
         StashNotificationCenter.shared.notify(key: "keyA", in: userDefaults)
 
-        // Allow the RunLoop to process notifications
         RunLoop.main.run(mode: .default, before: Date().addingTimeInterval(0.05))
 
         #expect(keyANotificationCount == 1, "keyA should receive exactly 1 notification")
@@ -99,7 +97,6 @@ struct StashedNotificationIsolationTests {
         var intObserverFireCount = 0
         var cancellables = Set<AnyCancellable>()
 
-        // Subscribe to notification center for each key to count broadcasts
         StashNotificationCenter.shared
             .publisher(for: "isolationString", in: userDefaults)
             .sink { stringObserverFireCount += 1 }
@@ -110,10 +107,8 @@ struct StashedNotificationIsolationTests {
             .sink { intObserverFireCount += 1 }
             .store(in: &cancellables)
 
-        // Only change the string value
         sut.stringValue = "changed"
 
-        // Allow notification propagation
         RunLoop.main.run(mode: .default, before: Date().addingTimeInterval(0.05))
 
         #expect(stringObserverFireCount >= 1, "String key should be notified")
@@ -145,7 +140,6 @@ struct StashedNotificationIsolationTests {
             .sink { keyCCount += 1 }
             .store(in: &cancellables)
 
-        // Change only keyA, then only keyB
         StashNotificationCenter.shared.notify(key: "seqKeyA", in: userDefaults)
         RunLoop.main.run(mode: .default, before: Date().addingTimeInterval(0.05))
 

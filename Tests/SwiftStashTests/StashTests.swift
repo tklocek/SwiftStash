@@ -65,7 +65,6 @@ struct StashTests {
                 @Stash("appStorageStyle.stash.optionalInt") var optionalValue: Int?
             }
 
-            // `let` works because @Stash setters are nonmutating.
             let sut = AppStorageStyleStorage()
 
             #expect(sut.value == 9)
@@ -433,7 +432,6 @@ struct StashTests {
         let sut = TestStorage(userDefaults: userDefaults)
         sut.theme = .dark
         
-        // Verify the raw value (String) is stored, not the enum itself
         let storedValue = userDefaults.object(forKey: "testTheme") as? String
         #expect(storedValue == Theme.dark.rawValue)
         #expect(storedValue == "dark")
@@ -467,7 +465,6 @@ struct StashTests {
         let sut = TestStorage(userDefaults: userDefaults)
         sut.priority = .critical
         
-        // Verify the raw value (Int) is stored, not the enum itself
         let storedValue = userDefaults.object(forKey: "testPriority") as? Int
         #expect(storedValue == Priority.critical.rawValue)
         #expect(storedValue == 4)

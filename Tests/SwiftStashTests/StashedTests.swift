@@ -651,11 +651,9 @@ struct StashedTests {
         
         let binding = sut.$intValue
         
-        // Update via binding
         binding.wrappedValue = 50
         #expect(sut.intValue == 50)
         
-        // Update via property
         sut.intValue = 75
         #expect(binding.wrappedValue == 75)
     }
@@ -673,9 +671,6 @@ struct StashedTests {
     }
     
     // MARK: - Persistence & Cross-Instance Updates
-    
-    // Note: Memory management tests are not applicable for @Stashed since it's a SwiftUI View (struct).
-    // SwiftUI manages the lifecycle of Views and their DynamicProperty storage automatically.
     
     @Test
     func `Changes in one instance are reflected in another instance`() {
@@ -744,7 +739,6 @@ struct StashedTests {
         let (userDefaults, cleanup) = makeUserDefaults(suiteName: "stashed.enum.invalid")
         defer { cleanup() }
         
-        // Store an invalid raw value
         userDefaults.set("invalid_theme", forKey: "stashedTheme")
         
         let sut = StashedTestView(userDefaults: userDefaults)

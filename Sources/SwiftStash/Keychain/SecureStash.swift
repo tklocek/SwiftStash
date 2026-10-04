@@ -484,7 +484,6 @@ private struct KeychainItemStorage<Coder: KeychainValueCoder>: KeychainStorage {
                 storageType: .keychain
             )
         } catch let error where error == .itemNotFound {
-            // Item doesn't exist, nothing to delete
             Logging.logOperation(
                 "DELETE (already absent)",
                 key: key,
@@ -503,7 +502,8 @@ private struct KeychainItemStorage<Coder: KeychainValueCoder>: KeychainStorage {
     }
 
     private func saveOrUpdate(_ data: Data) {
-        // Try to save (will fail if exists)
+        // Add first and update only on a duplicate: checking for the item beforehand would
+        // cost an extra query and race with other writers.
         do {
             try KeychainRuntime.shared.backend.save(
                 data,
@@ -521,7 +521,6 @@ private struct KeychainItemStorage<Coder: KeychainValueCoder>: KeychainStorage {
                 storageType: .keychain
             )
         } catch let error where error == .duplicateItem {
-            // Item exists, update instead
             do {
                 try KeychainRuntime.shared.backend.update(
                     data,

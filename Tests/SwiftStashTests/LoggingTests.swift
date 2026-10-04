@@ -98,7 +98,6 @@ struct LoggingTests {
         let storage = TestStorage(userDefaults: userDefaults)
 
         await withTaskGroup(of: Void.self) { group in
-            // Concurrent writes
             for i in 0..<50 {
                 group.addTask {
                     storage.stringValue = "value-\(i)"
@@ -107,7 +106,6 @@ struct LoggingTests {
                 }
             }
 
-            // Concurrent reads
             for _ in 0..<50 {
                 group.addTask {
                     _ = storage.stringValue
@@ -117,7 +115,6 @@ struct LoggingTests {
             }
         }
 
-        // Verify final state is consistent (one of the written values)
         let finalValue = storage.stringValue
         let finalInt = storage.intValue
         let finalBool = storage.boolValue
