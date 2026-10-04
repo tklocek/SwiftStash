@@ -17,13 +17,14 @@ public extension Stashed {
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
     ///   - defaultValue: The default value to return if no value is stored.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     init(
         key: some RawRepresentable<String>,
         defaultValue: Value,
         store: UserDefaults? = nil
     ) where Value: UserDefaultsPrimitiveType {
-        self.init(key: key.rawValue, defaultValue: defaultValue, store: store)
+        self.init(key: key.rawValue, defaultValue: defaultValue, store: store, scope: StashScope.of(key))
     }
 
     /// Creates a SwiftUI-aware property wrapper for primitive values in UserDefaults
@@ -31,13 +32,14 @@ public extension Stashed {
     /// - Parameters:
     ///   - wrappedValue: The default value to return if no value is stored.
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     init(
         wrappedValue: Value,
         _ key: some RawRepresentable<String>,
         store: UserDefaults? = nil
     ) where Value: UserDefaultsPrimitiveType {
-        self.init(key: key.rawValue, defaultValue: wrappedValue, store: store)
+        self.init(key: key.rawValue, defaultValue: wrappedValue, store: store, scope: StashScope.of(key))
     }
 }
 
@@ -48,24 +50,26 @@ public extension Stashed where Value: ExpressibleByNilLiteral & UserDefaultsPrim
     /// using a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     init(
         key: some RawRepresentable<String>,
         store: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, store: store)
+        self.init(key: key.rawValue, store: store, scope: StashScope.of(key))
     }
 
     /// Creates a SwiftUI-aware property wrapper for optional primitive values in UserDefaults
     /// using `@AppStorage`-style syntax with a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     init(
         _ key: some RawRepresentable<String>,
         store: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, store: store)
+        self.init(key: key.rawValue, store: store, scope: StashScope.of(key))
     }
 }
 
@@ -77,7 +81,8 @@ public extension Stashed where Value: Codable {
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
     ///   - defaultValue: The default value to return if no value is stored or decoding fails.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     ///   - encoder: Custom JSON encoder (defaults to a standard `JSONEncoder`). Configure it
     ///     fully before passing it in; the wrapper keeps using this instance, so it must not
     ///     be mutated afterwards.
@@ -90,7 +95,7 @@ public extension Stashed where Value: Codable {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        self.init(codable: key.rawValue, defaultValue: defaultValue, store: store, encoder: encoder, decoder: decoder)
+        self.init(codable: key.rawValue, defaultValue: defaultValue, store: store, scope: StashScope.of(key), encoder: encoder, decoder: decoder)
     }
 
     /// Creates a SwiftUI-aware property wrapper for Codable values in UserDefaults using JSON encoding
@@ -98,7 +103,8 @@ public extension Stashed where Value: Codable {
     /// - Parameters:
     ///   - wrappedValue: The default value to return if no value is stored or decoding fails.
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     ///   - encoder: Custom JSON encoder (defaults to a standard `JSONEncoder`). Configure it
     ///     fully before passing it in; the wrapper keeps using this instance, so it must not
     ///     be mutated afterwards.
@@ -111,7 +117,7 @@ public extension Stashed where Value: Codable {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        self.init(codable: key.rawValue, defaultValue: wrappedValue, store: store, encoder: encoder, decoder: decoder)
+        self.init(codable: key.rawValue, defaultValue: wrappedValue, store: store, scope: StashScope.of(key), encoder: encoder, decoder: decoder)
     }
 }
 
@@ -122,7 +128,8 @@ public extension Stashed where Value: Codable & ExpressibleByNilLiteral {
     /// using JSON encoding, using a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     ///   - encoder: Custom JSON encoder (defaults to a standard `JSONEncoder`). Configure it
     ///     fully before passing it in; the wrapper keeps using this instance, so it must not
     ///     be mutated afterwards.
@@ -134,7 +141,7 @@ public extension Stashed where Value: Codable & ExpressibleByNilLiteral {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        self.init(codable: key.rawValue, store: store, encoder: encoder, decoder: decoder)
+        self.init(codable: key.rawValue, store: store, scope: StashScope.of(key), encoder: encoder, decoder: decoder)
     }
 }
 
@@ -146,13 +153,14 @@ public extension Stashed where Value: RawRepresentable, Value.RawValue: Property
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
     ///   - defaultValue: The default value to return if no value is stored or conversion fails.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     init(
         key: some RawRepresentable<String>,
         defaultValue: Value,
         store: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, defaultValue: defaultValue, store: store)
+        self.init(key: key.rawValue, defaultValue: defaultValue, store: store, scope: StashScope.of(key))
     }
 
     /// Creates a SwiftUI-aware property wrapper for RawRepresentable values (like enums) in UserDefaults
@@ -160,13 +168,14 @@ public extension Stashed where Value: RawRepresentable, Value.RawValue: Property
     /// - Parameters:
     ///   - wrappedValue: The default value to return if no value is stored or conversion fails.
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     init(
         wrappedValue: Value,
         _ key: some RawRepresentable<String>,
         store: UserDefaults? = nil
     ) {
-        self.init(key: key.rawValue, defaultValue: wrappedValue, store: store)
+        self.init(key: key.rawValue, defaultValue: wrappedValue, store: store, scope: StashScope.of(key))
     }
 }
 
@@ -177,23 +186,25 @@ public extension Stashed {
     /// using a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     init<Wrapped>(
         key: some RawRepresentable<String>,
         store: UserDefaults? = nil
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
-        self.init(key: key.rawValue, store: store)
+        self.init(key: key.rawValue, store: store, scope: StashScope.of(key))
     }
 
     /// Creates a SwiftUI-aware property wrapper for optional RawRepresentable values in UserDefaults
     /// using `@AppStorage`-style syntax with a string-backed key type.
     /// - Parameters:
     ///   - key: The key to store the value under; its `rawValue` is used as the UserDefaults key.
-    ///   - store: The UserDefaults instance to use. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to use. Defaults to the environment's store,
+    ///     else the store configured for the key's scope, else the globally configured instance.
     init<Wrapped>(
         _ key: some RawRepresentable<String>,
         store: UserDefaults? = nil
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
-        self.init(key: key.rawValue, store: store)
+        self.init(key: key.rawValue, store: store, scope: StashScope.of(key))
     }
 }

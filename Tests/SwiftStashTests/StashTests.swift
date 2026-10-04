@@ -52,30 +52,35 @@ struct StashTests {
     }
 
     @Test
-    func `AppStorage-style Stash declaration works for default and optional primitive values`() {
-        let key1 = "appStorageStyle.stash.int"
-        let key2 = "appStorageStyle.stash.optionalInt"
-        defer {
-            UserDefaults.standard.removeObject(forKey: key1)
-            UserDefaults.standard.removeObject(forKey: key2)
+    func `AppStorage-style Stash declaration works for default and optional primitive values`() async {
+        // The store-less declaration resolves the configured store; configuring it is
+        // process-global, hence the exit test.
+        await #expect(processExitsWith: .success) {
+            let suiteName = "swiftstash.tests.appStorageStyle.stash.\(UUID().uuidString)"
+            defer { UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName) }
+            SwiftStash.configureUserDefaults(suiteName: suiteName)
+
+            struct AppStorageStyleStorage {
+                @Stash("appStorageStyle.stash.int") var value: Int = 9
+                @Stash("appStorageStyle.stash.optionalInt") var optionalValue: Int?
+            }
+
+            // `let` works because @Stash setters are nonmutating.
+            let sut = AppStorageStyleStorage()
+
+            #expect(sut.value == 9)
+            #expect(sut.optionalValue == nil)
+
+            sut.value = 42
+            sut.optionalValue = 7
+
+            #expect(sut.value == 42)
+            #expect(sut.optionalValue == 7)
+
+            let suite = UserDefaults(suiteName: suiteName)!
+            #expect(suite.integer(forKey: "appStorageStyle.stash.int") == 42)
+            #expect(suite.integer(forKey: "appStorageStyle.stash.optionalInt") == 7)
         }
-
-        struct AppStorageStyleStorage {
-            @Stash("appStorageStyle.stash.int") var value: Int = 9
-            @Stash("appStorageStyle.stash.optionalInt") var optionalValue: Int?
-        }
-
-        // `let` works because @Stash setters are nonmutating.
-        let sut = AppStorageStyleStorage()
-
-        #expect(sut.value == 9)
-        #expect(sut.optionalValue == nil)
-
-        sut.value = 42
-        sut.optionalValue = 7
-
-        #expect(sut.value == 42)
-        #expect(sut.optionalValue == 7)
     }
     
     // MARK: - Optional Primitives

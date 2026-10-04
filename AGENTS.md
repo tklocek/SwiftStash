@@ -89,6 +89,31 @@ Typed keys: every initialiser also accepts any `RawRepresentable<String>` key (`
 
 Parameter-label asymmetry is intentional — don't "fix" it: `Stash` calls the store `userDefaults:` (the Foundation-side name), while `@Stashed` uses `store:` (mirrors `@AppStorage`) and `SwiftStash.updates(forKey:in:)` uses `in:` (reads naturally at the call site).
 
+### Which store a wrapper uses
+
+One resolution chain for `@Stash`, `@Stashed`, and `SwiftStash.updates(forKey:in:)`:
+
+1. explicit `userDefaults:` / `store:` / `in:` — the only per-declaration override;
+2. SwiftUI environment (`@Stashed` only, when hosted): `.stashStore(_:for: scope)`, then `.stashStore(_:)` — the unscoped modifier covers scoped wrappers too; the modifier nearest the view wins;
+3. the store configured for the key's `StashScope` — `SwiftStash.configureUserDefaults(_:for:)`;
+4. the application-level store — `SwiftStash.configureUserDefaults(_:)` / `(suiteName:)`, else `.standard`.
+
+Rungs 3–4 are read **once, at wrapper init** (deliberate: no lock per access, simple observer cache). `SwiftStash.userDefaults` / `.userDefaults(for:)` read the configuration; `resetUserDefaults()` / `resetUserDefaults(for:)` reset it.
+
+Scopes are declared **once, on the key type** — never per declaration:
+
+```swift
+extension StashScope { static let tipJar = StashScope("TipJarKit") }
+enum TipJarKey: String, StashScopedKey {
+    case tipCount
+    static var stashScope: StashScope { .tipJar }
+}
+@Stash(TipJarKey.tipCount) var tipCount = 0               // resolves the .tipJar store
+SwiftStash.configureUserDefaults(groupDefaults, for: .tipJar)  // app moves the package's prefs
+```
+
+The existing `some RawRepresentable<String>` initialisers detect `StashScopedKey` at runtime, so no new overloads exist. An unconfigured scope falls back to the application level. `@SecureStash` ignores scopes (keychain is namespaced by `service`).
+
 ### Projected values
 
 - `@Stash` projects `StashHandle`: `$prop.exists` (distinguishes stored-default from nothing-stored), `$prop.remove()`, `$prop.key`, `$prop.updates` (typed `AsyncStream`: current value, then every change).
@@ -165,6 +190,8 @@ try keychain.deleteKey(CryptoKeyDescriptor(stringTag: "com.example.signing"))  /
 | Settings bound to SwiftUI controls with live re-render | `@Stashed` (SwiftUIView) + `@Stash` (elsewhere, same key) |
 | Auth tokens, API keys, passwords, encryption keys | `@SecureStash` |
 | Shared settings across app + extensions | `SwiftStash.configureUserDefaults(suiteName: "group…")` |
+| A package's own preferences, movable by the host app | `StashScope` + key type conforming to `StashScopedKey`; app calls `configureUserDefaults(_:for:)` |
+| Keep a SwiftUI test/preview off the real preferences | `.stashStore(testDefaults)` (next to `.defaultAppStorage(testDefaults)`) |
 | iCloud-synced credentials | `@SecureStash(key:…, isSynchronizable: true)` + syncable accessibility (not `*ThisDeviceOnly`) |
 | React to a setting changing anywhere in the app | `SwiftStash.updates(forKey:)` or `$prop.updates` |
 | Detect "never set" vs "set to default" | `$prop.exists` |
@@ -189,6 +216,8 @@ try keychain.deleteKey(CryptoKeyDescriptor(stringTag: "com.example.signing"))  /
 12. **Key-usage prompts fire at use, not at load** — `loadKeyReference` returns without authentication; user-presence flags are enforced when the `SecKey` is used (e.g. `SecKeyCreateSignature`). Pass a satisfied `LAContext` to reuse a confirmation.
 13. **Crypto/biometric APIs are compile-time unavailable on tvOS** — the real implementations sit behind `#if canImport(LocalAuthentication)`, and `KeychainCrypto+Unavailable.swift` declares `@available(*, unavailable, message:)` stubs so tvOS callers get "requires the LocalAuthentication framework" instead of a bare "no member" error. When adding a crypto method, add its stub there too (LAContext parameters omitted — the type doesn't exist in that SDK).
 14. **Data-based keychain writes support password classes only** — `.certificate`, `.key`, and `.identity` cannot be created via `kSecValueData` (SecItem expects `kSecValueRef` for them), so `@SecureStash`/`KeychainManager` writes with those classes fail at the SecItem layer. The cases exist for reading/deleting items created elsewhere.
+15. **UserDefaults stores are resolved at wrapper init** — configure (`configureUserDefaults…`) before the first wrapper is created; wrappers that already exist keep their store, and a late configure call is logged as an error. `static let` wrappers resolve on first touch. `.stashStore(_:)` reaches hosted `@Stashed` only — a view model's `@Stash` needs its store injected via `userDefaults:`.
+16. **A package configures only its own `StashScope`** — `SwiftStash.configureUserDefaults(_:)` (application level) belongs to the app; a package calling it would move the app's preferences too.
 
 ## Adoption playbook (migrating an existing app to SwiftStash)
 
@@ -198,6 +227,7 @@ When asked to adopt SwiftStash in a consuming app, follow this order. The key pr
 2. **Inventory existing keys**: grep for `@AppStorage`, `UserDefaults`, `forKey:`, and any keychain wrapper. Collect the key strings into one `enum SettingsKey: String` — preserve the exact existing strings, including any dots (storage still works with dots; only `updates` observation doesn't).
 3. **Convert mechanically**:
    - `@AppStorage("k") var x: T = d` in a View → `@Stashed("k") var x: T = d` — rename the attribute, nothing else changes
+   - `.defaultAppStorage(store)` → add `.stashStore(store)` next to it (keep both while any `@AppStorage` remains)
    - `@AppStorage` in non-View types → `@Stash("k") var x: T = d` (and remove the SwiftUI import if now unused)
    - `UserDefaults` get/set pairs → one `@Stash` property; JSON-encoded blobs → `@Stash(codable: "k") var x = d`. If the persisted format used custom `JSONEncoder`/`JSONDecoder` strategies (dates, keys), pass the same configured coders via `encoder:`/`decoder:` so existing payloads keep decoding and new writes keep the format.
    - enums stored via `rawValue` → `@Stash("k") var x: T = d` directly (raw-value format is identical)
@@ -257,6 +287,8 @@ cd Example && xcodebuild -project SwiftStashExample.xcodeproj \
 
 - Framework is **Swift Testing** (`@Test`, `#expect`), not XCTest. Test names use backticks: `` func `Optional String returns nil when key is absent`() ``.
 - UserDefaults tests: use `makeUserDefaults(suiteName:)` from `Tests/SwiftStashTests/Models/TestHelpers.swift` — returns isolated defaults plus a cleanup closure.
+- Tests never touch `UserDefaults.standard`. Global configuration (`SwiftStash.configureUserDefaults…`) changes only inside exit tests (`#expect(processExitsWith:)`, see `ConfigurationTests.swift`); scope tests there also point the application level at a throwaway suite, so a regression cannot write into the runner's `.standard`.
+- Hosted SwiftUI tests (`update()`, environment): `HostedView` + `StashedProbeView` in `Tests/SwiftStashTests/Models/HostedStashedViews.swift` render through an `NSHostingView`; `await host.settle()` when a KVO delivery must reach the view.
 - Keychain tests: wrap in `runWithMockBackend { … }`, which swaps `KeychainRuntime.shared` to an in-memory backend — tests never touch the real keychain, so real-device keychain behaviour is validated via the example app, not CI.
 - Crypto tests (`KeychainCryptoTests.swift`) cover only the keychain-free parts: flag/error mapping, descriptors, `SecAccessControl` construction, and validation that throws before any `SecItem` call. Biometric prompts and Secure Enclave behaviour need real hardware → example app.
 

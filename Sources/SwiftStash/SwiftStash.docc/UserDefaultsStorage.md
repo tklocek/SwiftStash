@@ -105,9 +105,22 @@ appState = AppState(selectedTab: 1, scrollPosition: 100.0)
 appState = nil  // Removes from UserDefaults
 ```
 
-## Custom UserDefaults
+## Choosing the Store
 
-Use a custom UserDefaults suite:
+Every wrapper resolves its store once, when it is created, in this order:
+
+1. an explicit `userDefaults:` argument;
+2. the store configured for the key's ``StashScope``, when the key's type is a
+   ``StashScopedKey``;
+3. the application-level store, else `UserDefaults.standard`.
+
+`@Stashed` adds the SwiftUI environment between steps 1 and 2 — see <doc:SwiftUIStorage>.
+`SwiftStash.updates(forKey:in:bufferingPolicy:)` follows the same order, with `in:` as the
+explicit store.
+
+### An Explicit Store
+
+Pass the instance for one wrapper; nothing else changes:
 
 ```swift
 let sharedDefaults = UserDefaults(suiteName: "group.com.myapp.shared")!
@@ -115,6 +128,50 @@ let sharedDefaults = UserDefaults(suiteName: "group.com.myapp.shared")!
 @Stash("sharedData", userDefaults: sharedDefaults)
 var sharedData = ""
 ```
+
+### The Application-Level Store
+
+Configure it once at launch, before any wrapper is created — wrappers that already exist
+keep the store they resolved:
+
+```swift
+SwiftStash.configureUserDefaults(suiteName: "group.com.myapp.shared")
+// or, with an instance the app already holds:
+SwiftStash.configureUserDefaults(sharedDefaults)
+```
+
+``SwiftStash/userDefaults`` returns the configured store, for APIs that take a `UserDefaults`,
+and ``SwiftStash/resetUserDefaults()`` returns to `.standard`.
+
+### A Store per Package
+
+A package that uses SwiftStash internally keeps its preferences in a ``StashScope`` of its own,
+declared once on its key type:
+
+```swift
+extension StashScope {
+    static let tipJar = StashScope("TipJarKit")
+}
+
+enum TipJarKey: String, StashScopedKey {
+    case tipCount, lastTipDate
+    static var stashScope: StashScope { .tipJar }
+}
+
+@Stash(TipJarKey.tipCount) var tipCount = 0
+```
+
+Until somebody configures the scope, its wrappers use the application-level store, so
+adopting a scope changes nothing. Configuring it moves every wrapper of the scope that does
+not pass an explicit store — the package's own, or the app's, for example into an App Group:
+
+```swift
+SwiftStash.configureUserDefaults(groupDefaults, for: .tipJar)
+```
+
+> Important: A package configures only its own scope, never the application level.
+> ``SwiftStash/configureUserDefaults(_:)`` belongs to the app; a package that called it would
+> move the app's preferences too.
 
 ## Collections
 
@@ -176,6 +233,9 @@ enum SettingsKey: String {
 
 @Stash(SettingsKey.username) var username = ""
 ```
+
+A key type that also conforms to ``StashScopedKey`` routes its wrappers to its scope's store
+(see <doc:UserDefaultsStorage#A-Store-per-Package>).
 
 ## Key Naming Conventions
 

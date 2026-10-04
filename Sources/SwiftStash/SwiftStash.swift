@@ -104,10 +104,28 @@ public enum SwiftStash {
 
     // MARK: - UserDefaults Configuration
 
-    /// Configures the default `UserDefaults` suite used by `@Stash` and `@Stashed`.
+    /// Configures the application-level `UserDefaults` store used by `@Stash` and `@Stashed`.
     ///
-    /// Call this once at app launch to use a custom suite (e.g. for App Groups).
-    /// Individual wrappers can override by passing an explicit `userDefaults` or `store` parameter.
+    /// Call this once at app launch, before any wrapper is created: wrappers resolve their
+    /// store at initialisation, so wrappers that already exist keep the previous store (a late
+    /// call is logged as an error). Individual wrappers can override the store by passing an
+    /// explicit `userDefaults` or `store` parameter.
+    ///
+    /// ```swift
+    /// SwiftStash.configureUserDefaults(UserDefaults(suiteName: "group.com.example.app")!)
+    /// ```
+    ///
+    /// - Important: The application level belongs to the app. A package that uses SwiftStash
+    ///   configures only its own ``StashScope``, with ``configureUserDefaults(_:for:)``.
+    /// - Parameter store: The store for every wrapper outside a configured scope.
+    public static func configureUserDefaults(_ store: UserDefaults) {
+        StashConfiguration.shared.configure(store)
+    }
+
+    /// Configures the application-level `UserDefaults` suite used by `@Stash` and `@Stashed`.
+    ///
+    /// Equivalent to ``configureUserDefaults(_:)`` with `UserDefaults(suiteName:)`; use it for
+    /// App Groups. The same rule applies: call it before any wrapper is created.
     ///
     /// ```swift
     /// SwiftStash.configureUserDefaults(suiteName: "group.com.example.app")
@@ -116,6 +134,54 @@ public enum SwiftStash {
     /// - Parameter suiteName: The suite name for `UserDefaults` (e.g. an App Group identifier).
     public static func configureUserDefaults(suiteName: String) {
         StashConfiguration.shared.configure(suiteName: suiteName)
+    }
+
+    /// Configures the `UserDefaults` store for the wrappers whose key type declares `scope`.
+    ///
+    /// A package calls this for its own scope; an app may call it to move a package's
+    /// preferences, for example into an App Group, without moving its own. Wrappers resolve
+    /// their store at initialisation, so call it before the scope's first wrapper is created.
+    ///
+    /// ```swift
+    /// SwiftStash.configureUserDefaults(groupDefaults, for: .tipJar)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - store: The store for the scope's wrappers.
+    ///   - scope: The scope to configure.
+    public static func configureUserDefaults(_ store: UserDefaults, for scope: StashScope) {
+        StashConfiguration.shared.configure(store, for: scope)
+    }
+
+    /// The application-level `UserDefaults` store: the one passed to
+    /// ``configureUserDefaults(_:)``, or `.standard`.
+    ///
+    /// Use it to hand the same store to APIs that take a `UserDefaults`.
+    public static var userDefaults: UserDefaults {
+        StashConfiguration.shared.userDefaults
+    }
+
+    /// The `UserDefaults` store the wrappers in `scope` resolve: the scope's configured store,
+    /// else the application-level one.
+    /// - Parameter scope: The scope to look up.
+    public static func userDefaults(for scope: StashScope) -> UserDefaults {
+        StashConfiguration.shared.userDefaults(for: scope)
+    }
+
+    /// Resets the application-level store to `.standard` and removes every scope's store.
+    ///
+    /// Wrappers that already exist keep the store they resolved.
+    public static func resetUserDefaults() {
+        StashConfiguration.shared.reset()
+    }
+
+    /// Removes the store configured for `scope`, so its wrappers fall back to the
+    /// application-level store.
+    ///
+    /// Wrappers that already exist keep the store they resolved.
+    /// - Parameter scope: The scope to reset.
+    public static func resetUserDefaults(for scope: StashScope) {
+        StashConfiguration.shared.reset(scope)
     }
 
     // MARK: - Keychain Configuration

@@ -40,7 +40,7 @@ public extension SwiftStash {
         in store: UserDefaults? = nil,
         bufferingPolicy: AsyncStream<Void>.Continuation.BufferingPolicy = .bufferingNewest(1)
     ) -> AsyncStream<Void> {
-        let resolvedStore = store ?? StashConfiguration.shared.userDefaults
+        let resolvedStore = store ?? StashConfiguration.shared.resolveUserDefaults(for: nil)
         return AsyncStream(bufferingPolicy: bufferingPolicy) { continuation in
             let observer = UserDefaultsKeyObserver(store: resolvedStore, key: key) {
                 continuation.yield()
@@ -59,7 +59,9 @@ public extension SwiftStash {
     /// See ``updates(forKey:in:bufferingPolicy:)-swift.type.method`` for details.
     /// - Parameters:
     ///   - key: The key to observe; its `rawValue` is used as the UserDefaults key.
-    ///   - store: The UserDefaults instance to observe. Defaults to the globally configured instance.
+    ///   - store: The UserDefaults instance to observe. Defaults to the store configured for the
+    ///     key's ``StashScope`` when its type is a ``StashScopedKey``, else the globally
+    ///     configured instance.
     ///   - bufferingPolicy: How changes are buffered when they arrive faster than the consumer
     ///     iterates. Defaults to `.bufferingNewest(1)` (bursts coalesce into one pending signal).
     /// - Returns: A stream that yields once per change until the consuming task is cancelled.
@@ -68,7 +70,10 @@ public extension SwiftStash {
         in store: UserDefaults? = nil,
         bufferingPolicy: AsyncStream<Void>.Continuation.BufferingPolicy = .bufferingNewest(1)
     ) -> AsyncStream<Void> {
-        updates(forKey: key.rawValue, in: store, bufferingPolicy: bufferingPolicy)
+        let resolvedStore = store ?? StashScope.of(key).map {
+            StashConfiguration.shared.resolveUserDefaults(for: $0)
+        }
+        return updates(forKey: key.rawValue, in: resolvedStore, bufferingPolicy: bufferingPolicy)
     }
 }
 

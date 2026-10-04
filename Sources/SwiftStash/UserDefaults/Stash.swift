@@ -89,7 +89,7 @@ public struct Stash<Value: Sendable>: Sendable {
         defaultValue: Value,
         userDefaults: UserDefaults? = nil
     ) where Value: UserDefaultsPrimitiveType {
-        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.userDefaults
+        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.resolveUserDefaults(for: nil)
         self.storage = AnyUserDefaultsStorage(
             PrimitiveUserDefaultsStorage(
                 key: key,
@@ -161,7 +161,7 @@ public extension Stash where Value: Codable {
         encoder: JSONEncoder? = nil,
         decoder: JSONDecoder? = nil
     ) {
-        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.userDefaults
+        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.resolveUserDefaults(for: nil)
         self.storage = AnyUserDefaultsStorage(
             CodableUserDefaultsStorage(
                 key: key,
@@ -231,7 +231,7 @@ public extension Stash where Value: RawRepresentable, Value.RawValue: PropertyLi
         defaultValue: Value,
         userDefaults: UserDefaults? = nil
     ) {
-        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.userDefaults
+        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.resolveUserDefaults(for: nil)
         self.storage = AnyUserDefaultsStorage(
             RawRepresentableUserDefaultsStorage(
                 key: key,
@@ -267,7 +267,7 @@ public extension Stash {
         key: String,
         userDefaults: UserDefaults? = nil
     ) where Value == Wrapped?, Wrapped: RawRepresentable, Wrapped.RawValue: PropertyListNativeType {
-        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.userDefaults
+        let resolvedDefaults = userDefaults ?? StashConfiguration.shared.resolveUserDefaults(for: nil)
         self.storage = AnyUserDefaultsStorage(
             OptionalRawRepresentableUserDefaultsStorage<Wrapped>(
                 key: key,
