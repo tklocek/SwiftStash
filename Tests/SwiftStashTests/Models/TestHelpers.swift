@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+import Combine
 import Foundation
 @testable import SwiftStash
 
@@ -47,6 +48,40 @@ func makeUserDefaults(
     }
 
     return (userDefaults, cleanup)
+}
+
+// MARK: - Asynchronous Delivery
+
+/// Subscribes to `publisher` immediately and buffers everything it emits, so a test can
+/// subscribe, trigger a change, and then await the delivery without missing it.
+func values<P: Publisher>(of publisher: P) -> AsyncStream<P.Output> where P.Failure == Never, P.Output: Sendable {
+    AsyncStream { continuation in
+        let subscription = SubscriptionBox(publisher.sink { continuation.yield($0) })
+        continuation.onTermination = { _ in subscription.cancel() }
+    }
+}
+
+extension AsyncStream where Element: Sendable {
+    /// Awaits the first element that satisfies `predicate`; `nil` only if the stream finishes.
+    func firstValue(where predicate: @Sendable (Element) -> Bool) async -> Element? {
+        for await element in self where predicate(element) {
+            return element
+        }
+        return nil
+    }
+}
+
+/// `@unchecked` because `AnyCancellable` is not annotated `Sendable`; `cancel()` is thread-safe.
+private final class SubscriptionBox: @unchecked Sendable {
+    private let cancellable: AnyCancellable
+
+    init(_ cancellable: AnyCancellable) {
+        self.cancellable = cancellable
+    }
+
+    func cancel() {
+        cancellable.cancel()
+    }
 }
 
 // MARK: - Keychain Mock Backend

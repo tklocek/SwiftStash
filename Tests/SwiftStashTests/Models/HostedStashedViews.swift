@@ -10,20 +10,24 @@
 import AppKit
 import Foundation
 import SwiftStash
-import SwiftStashUI
+@testable import SwiftStashUI
+import Combine
 import SwiftUI
 
 /// Records what a hosted `@Stashed` rendered, and hands out its binding.
 @MainActor
 final class StashedProbe {
-    private(set) var renderedValue: Int?
-    private(set) var renderCount = 0
+    private(set) var renderedValues: [Int] = []
     private var binding: Binding<Int>?
+    /// The rendered wrapper's published values, to await a delivery before rendering again.
+    private(set) var values: AnyPublisher<Int, Never>?
 
-    func record(_ value: Int, binding: Binding<Int>) {
-        renderedValue = value
-        renderCount += 1
+    var renderedValue: Int? { renderedValues.last }
+
+    func record(_ value: Int, binding: Binding<Int>, values: AnyPublisher<Int, Never>) {
+        renderedValues.append(value)
         self.binding = binding
+        self.values = values
     }
 
     /// Writes through the projected `Binding`, as a control in the view would.
@@ -48,7 +52,7 @@ struct StashedProbeView: View {
     }
 
     var body: some View {
-        probe.record(value, binding: $value)
+        probe.record(value, binding: $value, values: _value.currentValues)
         return Text("\(value)")
     }
 }
@@ -70,16 +74,8 @@ final class HostedView<Content: View> {
         render()
     }
 
-    /// Yields the main actor so KVO deliveries (hopped onto it in a `Task`) and the
-    /// debounced notification can reach the view, then renders.
-    func settle() async {
-        try? await Task.sleep(nanoseconds: 50_000_000)
-        render()
-    }
-
-    /// Lets pending invalidations (bindings, debounced notifications) reach the view.
+    /// Renders the view if anything invalidated it since the last render.
     func render() {
-        RunLoop.main.run(mode: .default, before: Date().addingTimeInterval(0.05))
         hostingView.layoutSubtreeIfNeeded()
     }
 }

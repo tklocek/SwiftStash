@@ -314,7 +314,8 @@ cd Example && xcodebuild -project SwiftStashExample.xcodeproj \
 - Framework is **Swift Testing** (`@Test`, `#expect`), not XCTest. Test names use backticks: `` func `Optional String returns nil when key is absent`() ``.
 - UserDefaults tests: use `makeUserDefaults(suiteName:)` from `Tests/SwiftStashTests/Models/TestHelpers.swift` — returns isolated defaults plus a cleanup closure.
 - Tests never touch `UserDefaults.standard`. Global configuration (`SwiftStash.configureUserDefaults…`) changes only inside exit tests (`#expect(processExitsWith:)`, see `ConfigurationTests.swift`); scope tests there also point the application level at a throwaway suite, so a regression cannot write into the runner's `.standard`.
-- Hosted SwiftUI tests (`update()`, environment): `HostedView` + `StashedProbeView` in `Tests/SwiftStashTests/Models/HostedStashedViews.swift` render through an `NSHostingView`; `await host.settle()` when a KVO delivery must reach the view.
+- Hosted SwiftUI tests (`update()`, environment): `HostedView` + `StashedProbeView` in `Tests/SwiftStashTests/Models/HostedStashedViews.swift` render through an `NSHostingView`; `host.render()` lays the view out synchronously.
+- **Tests never wait for time to pass** — no `Task.sleep`, run-loop spinning, polling, or timeouts. Subscribe first, trigger, then await the delivery: `let delivered = values(of: publisher)` (`TestHelpers.swift`), write, `await delivered.firstValue { … }`. `@Stashed` exposes its published values to tests as the internal `currentValues`; a hosted probe hands them out as `probe.values`. To prove something does *not* arrive, await a later event that is delivered in order after it (a sentinel write), then assert.
 - Keychain tests: wrap in `runWithMockBackend { … }`, which swaps `KeychainRuntime.shared` to an in-memory backend — tests never touch the real keychain, so real-device keychain behaviour is validated via the example app, not CI.
 - Crypto tests (`KeychainCryptoTests.swift`) cover only the keychain-free parts: flag/error mapping, descriptors, `SecAccessControl` construction, and validation that throws before any `SecItem` call. Biometric prompts and Secure Enclave behaviour need real hardware → example app.
 
@@ -324,7 +325,7 @@ cd Example && xcodebuild -project SwiftStashExample.xcodeproj \
 - `SwiftStash` module must not import SwiftUI (its whole reason to exist). UI-facing code goes in `SwiftStashUI`.
 - The core wrappers `Stash` and `SecureStash` are `Sendable` with `nonmutating set` — keep them usable as `static let`. `Stashed` is a `@MainActor` SwiftUI `DynamicProperty`, not the shared-state wrapper.
 - Public API is documented with DocC; update the catalogue when adding public symbols. The package catalogue (articles + core symbols) is `Sources/SwiftStash/SwiftStash.docc/`; `Sources/SwiftStashUI/SwiftStashUI.docc/` holds only that module's landing page (its abstract is the module's tile on the merged documentation site built by `Scripts/build-docs.sh`).
-- Logging: keys are `.private`, type names `.public` — never log stored values.
+- Logging: keys are `.private`, type names `.public` — never log stored values. Operations and coding go to the unified log's `.debug` level, errors to `.error` (`Logging.osLogType(for:)`); never emit per-access messages at a level the system stores (`.default`/`.notice`), or every read and write lands on disk.
 
 ### Branding
 

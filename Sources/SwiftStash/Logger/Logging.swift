@@ -83,6 +83,18 @@ package final class Logging: @unchecked Sendable {
         unsafe _eventObserver = observer
     }
 
+    /// The unified-log level each kind of message is written at.
+    ///
+    /// Operations and coding details go to `.debug`: the unified log does not store that level,
+    /// so a read or write of a value costs nothing on disk and still shows up for anyone
+    /// streaming the log. Errors go to `.error`, which is stored.
+    package static func osLogType(for kind: LoggingEvent.Kind) -> OSLogType {
+        switch kind {
+        case .error: .error
+        case .operation, .coding: .debug
+        }
+    }
+
     private static func record(_ event: LoggingEvent) {
         lock.lock()
         let observer = unsafe _eventObserver
@@ -133,11 +145,12 @@ package final class Logging: @unchecked Sendable {
         guard logLevel.shouldLog(messageLevel: errorCategory.requiredLevel) else { return }
         
         if let key, let type {
-            errorCategory.logger.error(
+            errorCategory.logger.log(
+                level: osLogType(for: .error),
                 "\(message, privacy: .public) [key: \(key, privacy: .private), type: \(type, privacy: .public)]"
             )
         } else {
-            errorCategory.logger.error("\(message, privacy: .public)")
+            errorCategory.logger.log(level: osLogType(for: .error), "\(message, privacy: .public)")
         }
     }
     
@@ -159,18 +172,22 @@ package final class Logging: @unchecked Sendable {
         
         if let type, let itemClass {
             operationCategory.logger.log(
+                level: osLogType(for: .operation),
                 "\(operation, privacy: .public) [key: \(key, privacy: .private), type: \(type, privacy: .public), class: \(itemClass, privacy: .public)]"
             )
         } else if let type {
             operationCategory.logger.log(
+                level: osLogType(for: .operation),
                 "\(operation, privacy: .public) [key: \(key, privacy: .private), type: \(type, privacy: .public)]"
             )
         } else if let itemClass {
             operationCategory.logger.log(
+                level: osLogType(for: .operation),
                 "\(operation, privacy: .public) [key: \(key, privacy: .private), class: \(itemClass, privacy: .public)]"
             )
         } else {
             operationCategory.logger.log(
+                level: osLogType(for: .operation),
                 "\(operation, privacy: .public) [key: \(key, privacy: .private)]"
             )
         }
@@ -191,7 +208,8 @@ package final class Logging: @unchecked Sendable {
         record(LoggingEvent(kind: .coding, storageType: storageType, key: key))
         guard logLevel.shouldLog(messageLevel: codingCategory.requiredLevel) else { return }
         
-        codingCategory.logger.debug(
+        codingCategory.logger.log(
+            level: osLogType(for: .coding),
             "\(message, privacy: .public) [key: \(key, privacy: .private), type: \(type, privacy: .public)]"
         )
     }

@@ -10,6 +10,15 @@ Configure logging to debug and monitor storage operations.
 
 SwiftStash provides integrated logging for both UserDefaults (@Stash) and Keychain (@SecureStash) operations using Apple's OSLog system.
 
+## What Reaches the Disk
+
+Operations and encoding/decoding details are written at the unified log's `.debug` level,
+which the system does not store: they cost nothing on disk and appear only while somebody is
+watching — the Xcode console, Console.app with debug messages included, or `log stream`.
+Errors are written at `.error` and stored. Raising ``SwiftStash/logLevel`` therefore never
+fills the persisted log with reads and writes; it only decides what is emitted for a live
+viewer.
+
 ## Log Levels
 
 ### `.minimal` (Default, Production)
@@ -116,8 +125,15 @@ Logs appear automatically in Xcode's debug console when running your app.
 
 1. Open Console.app
 2. Select your device
-3. Filter by **Subsystem**: `SwiftStash`
-4. Further filter by category (e.g., `Keychain.Operations`)
+3. Enable **Action › Include Debug Messages** — operations and coding details are debug-level
+4. Filter by **Subsystem**: `SwiftStash`
+5. Further filter by category (e.g., `Keychain.Operations`)
+
+### From the Terminal
+
+```
+log stream --level debug --predicate 'subsystem == "SwiftStash"'
+```
 
 ### Example Filters
 
@@ -182,6 +198,7 @@ authToken = "secret"  // Logged to Keychain.Operations
 | `.minimal` | ✅ | ❌ | ❌ | Production |
 | `.normal` | ✅ | ✅ | ❌ | Debugging |
 | `.verbose` | ✅ | ✅ | ✅ | Development |
+| Unified log level | `.error` (stored) | `.debug` (not stored) | `.debug` (not stored) | |
 
 ## Performance
 

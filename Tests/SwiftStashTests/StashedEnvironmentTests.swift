@@ -69,7 +69,7 @@ struct StashedEnvironmentTests {
     }
 
     @Test
-    func `Changing the environment store switches the observer to the new store`() async {
+    func `Changing the environment store switches the observer to the new store`() async throws {
         let (first, cleanupFirst) = makeUserDefaults(suiteName: "environment.switch.first.\(UUID().uuidString)")
         let (second, cleanupSecond) = makeUserDefaults(suiteName: "environment.switch.second.\(UUID().uuidString)")
         defer {
@@ -95,13 +95,16 @@ struct StashedEnvironmentTests {
         #expect(first.integer(forKey: key) == 1)
         #expect(probe.renderedValue == 20)
 
-        // Writes to the store the view left no longer reach it.
-        let rendersBefore = probe.renderCount
+        // Writes to the store the view left no longer reach it: the next value the view
+        // receives is a later write to its current store.
+        let delivered = values(of: try #require(probe.values))
         first.set(10, forKey: key)
-        await host.settle()
+        second.set(21, forKey: key)
 
-        #expect(probe.renderCount == rendersBefore)
-        #expect(probe.renderedValue == 20)
+        #expect(await delivered.firstValue { $0 != 20 } == 21)
+        host.render()
+        #expect(probe.renderedValue == 21)
+        #expect(probe.renderedValues.contains(10) == false)
     }
 
     @Test
@@ -132,7 +135,7 @@ struct StashedEnvironmentTests {
     }
 
     @Test
-    func `External write to the environment store re-renders the hosted view`() async {
+    func `External write to the environment store re-renders the hosted view`() async throws {
         let (suite, cleanup) = makeUserDefaults(suiteName: "environment.external.\(UUID().uuidString)")
         defer { cleanup() }
         let (key, removeStrayKey) = Self.uniqueKey()
@@ -142,9 +145,11 @@ struct StashedEnvironmentTests {
         let host = HostedView(EnvironmentRoot(key: key, environmentStore: suite, probe: probe))
         #expect(probe.renderedValue == 0)
 
+        let delivered = values(of: try #require(probe.values))
         suite.set(7, forKey: key)
-        await host.settle()
 
+        #expect(await delivered.firstValue { $0 == 7 } == 7)
+        host.render()
         #expect(probe.renderedValue == 7)
     }
 
