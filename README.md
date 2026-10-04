@@ -12,6 +12,7 @@ UserDefaults · Keychain · SwiftUI — with built-in privacy-preserving logging
   <a href="https://www.swift.org/"><img src="https://img.shields.io/badge/Swift-6.2-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6.2"></a>
   <a href="#requirements"><img src="https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20visionOS%20%7C%20Mac%20Catalyst-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Platforms"></a>
   <a href="#installation"><img src="https://img.shields.io/badge/SPM-compatible-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift Package Manager"></a>
+  <a href="https://github.com/tklocek/SwiftStash/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/tklocek/SwiftStash/tests.yml?branch=main&style=flat-square&label=Tests" alt="Tests"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License"></a>
   <a href="https://tklocek.github.io/SwiftStash/documentation/"><img src="https://img.shields.io/badge/Documentation-DocC-34C759?style=flat-square&logo=swift&logoColor=white" alt="Documentation"></a>
 </p>

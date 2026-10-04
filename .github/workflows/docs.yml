@@ -15,10 +15,12 @@ permissions:
   pages: write
   id-token: write
 
-# One Pages deployment at a time; let in-flight deployments finish.
+# Deploys happen only from main, and that group never cancels — one Pages
+# deployment at a time. PR builds get their own per-branch group, and a new
+# push cancels the superseded in-flight build.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: pages-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build:

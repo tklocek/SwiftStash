@@ -238,6 +238,13 @@ swift test           # all tests (Swift Testing; UserDefaults suites are isolate
                      # NOT built by swift build — run after any public-API change; CI runs it too)
 ```
 
+CI (`.github/workflows/tests.yml`) runs on every PR and push to main: `swift build`,
+`swift test` (with a per-test Markdown summary via `Scripts/test-summary.py`),
+`Templates/check.sh`, and the example-app build below as a second job. Both job
+names — "Build & test (macOS)" and "Build example app (iOS)" — are required
+status checks in the `main` ruleset; renaming a job breaks branch protection
+until the ruleset is updated. Feature-branch pushes without a PR don't trigger CI.
+
 Example app (the only compile check for `SwiftStashUI` consumers — build it after touching `SwiftStashUI` or doing repo-wide renames; signing must be disabled, no dev team is configured):
 
 ```bash
